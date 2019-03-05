@@ -1,4 +1,5 @@
-vars:
+You can set these variables:
+
  * quota_dir
  * quota_name
  * quota_warn_from
@@ -9,8 +10,9 @@ vars:
  * quota_warn_message
  * quota_warn_signature
 
+Example:
+
 ```yml
-example:
   vars:
     quota_dir: /home
     quota_name: home
@@ -25,4 +27,7 @@ example:
 
 Set users quotas by using the [users role](https://git.coop/webarch/users):
 
-  users_quota: 1G
+```yml
+  vars:
+    users_quota: 1G
+```
