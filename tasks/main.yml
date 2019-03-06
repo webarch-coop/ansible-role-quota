@@ -1,15 +1,15 @@
 ---
 - name: Check that the quota_dir directory is on a partition
-  command: "mountpoint {{ quota_dir | default('/home' }}"
+  command: "mountpoint {{ quota_dir | default('/home') }}"
   register: quota_dir_mountpoint
 
 - name: Fail if not a partition
   fail:
     msg: "{{ quota_dir_mountpoint.stdout }}"
-  when:  "'is a mountpoint' not in quota_dir_mountpoint.stdout" 
+  when:  "'is a mountpoint' not in quota_dir_mountpoint.stdout"
 
 - name: Get the partition filesystem
-  shell: "df -P {{ quota_dir | default('/home' }} | tail -1 | awk '{ print $1 }'" 
+  shell: "df -P {{ quota_dir | default('/home') }} | tail -1 | awk '{ print $1 }'"
   register: quota_filesystem
 
 - name: Quota and quotatool present
@@ -30,7 +30,7 @@
 - name: Quotatab installed
   lineinfile:
     dest: /etc/quotatab
-    line: "{{ quota_filesystem.stdout }}:{{ quota_dir_name | default('home' }}"
+    line: "{{ quota_filesystem.stdout }}:{{ quota_dir_name | default('home') }}"
     state: present
 
 - name: Quota warning config in place
