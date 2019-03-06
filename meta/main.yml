@@ -5,7 +5,9 @@ galaxy_info:
   description: Ansible role for installing and settings disk quotas
   company: Webarchitects Co-operative
   license: license (GPLv3)
-  min_ansible_version: 1.2
+  # which version was bytes_to_human and human_to_bytes merged into?
+  # https://github.com/ansible/ansible/pull/12074
+  min_ansible_version: 2.2
   platforms:
     - name: debian
       versions:

@@ -38,5 +38,3 @@
     src: templates/warnquota.conf.j2
     dest: /etc/warnquota.conf
     backup: yes
-
-
