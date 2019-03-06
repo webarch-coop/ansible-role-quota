@@ -1,4 +1,8 @@
-You can set these variables:
+## Ansible Quota Role
+
+The `quota_dir` has to be a partition and this role will fail if it isn't.
+
+You can set these optional variables:
 
  * quota_dir
  * quota_name

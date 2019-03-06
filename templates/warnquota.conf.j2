@@ -1,11 +1,17 @@
 MAIL_CMD        = "/usr/sbin/sendmail -t"
 FROM            = "{{ quota_warn_from }}"
 SUBJECT         = "{{ quota_warn_subject }}"
-CC_TO           = "{{ quota_warn_cc }}"
+CC_TO           = "{{ quota_warn_cc }}" 
 SUPPORT         = "{{ quota_warn_support }}"
+{% if quota_warn_phone %}
 PHONE           = "{{ quota_warn_phone }}"
+{% endif %}
 # see /usr/share/doc/quota/warnquota.conf
+{% if quota_warn_message %}
 MESSAGE         = "{{ quota_warn_message }}"
+{% endif %}
+{% if quota_warn_signature %}
 SIGNATURE       = "{{ quota_warn_signature }}"
+{% endif %}
 CHARSET         = UTF-8
 

@@ -29,7 +29,7 @@
     state: present
 
 - name: Quota warning config in place
-  copy:
+  template:
     src: templates/warnquota.conf.j2
     dest: /etc/warnquota.conf
     backup: yes
