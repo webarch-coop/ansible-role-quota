@@ -1,1 +1,1 @@
-warnquota.conf.j2 gitlab-language=conf
+templates/warnquota.conf.j2 gitlab-language=conf
