@@ -13,7 +13,7 @@
       - quota
       - quotatool
     state: present
-    update_cache: True
+    update_cache: true
   register: quota_installed
 
 - name: Quota restarted
@@ -32,4 +32,4 @@
   template:
     src: templates/warnquota.conf.j2
     dest: /etc/warnquota.conf
-    backup: True
+    backup: true
