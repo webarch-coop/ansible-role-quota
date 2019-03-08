@@ -1,9 +1,9 @@
 ---
-#dependency:
-#  name: galaxy
-#
-#driver:
-#  name: docker
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
 
 lint:
   name: yamllint
