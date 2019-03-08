@@ -1,16 +1,17 @@
 ---
-dependency:
-  name: galaxy
-
-driver:
-  name: docker
+#dependency:
+#  name: galaxy
+#
+#driver:
+#  name: docker
 
 lint:
   name: yamllint
 
 platforms:
   - name: instance
-    image: debian:stretch
+    image: registry.git.coop/webarch/containers/images/ansible:0.1
+    pre_build_image: true
 
 provisioner:
   name: ansible
@@ -19,3 +20,6 @@ provisioner:
 
 scenario:
   name: default
+  test_sequence:
+    - lint
+    - idempotence
