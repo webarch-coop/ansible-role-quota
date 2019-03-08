@@ -1,6 +1,6 @@
 ## Ansible Quota Role
 
-The `quota_dir` has to be a partition and this role will fail if it isn't.
+The `quota_dir` has to be a partition and this role will fail if it isn't, it defaults to `/home`.
 
 You can set these optional variables:
 
