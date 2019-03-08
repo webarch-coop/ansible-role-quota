@@ -10,7 +10,7 @@ lint:
 
 platforms:
   - name: instance
-    image: registry.git.coop/webarch/containers/images/ansible:0.1
+    image: debian:stretch
 
 provisioner:
   name: ansible
@@ -19,8 +19,3 @@ provisioner:
 
 scenario:
   name: default
-
-# verifier:
-  # name: testinfra
-  # lint:
-    # name: flake8
