@@ -29,7 +29,7 @@
 
 - name: "Touch {{ quota_dir_name | default('home') }}/aquota.user"
   file:
-    path: "{{ quota_dir_name | default('home') }}/aquota.user"
+    path: "{{ quota_dir | default('/home') }}/aquota.user"
     state: touch
     access_time: preserve
     modification_time: preserve
