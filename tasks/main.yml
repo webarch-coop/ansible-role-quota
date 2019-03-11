@@ -42,22 +42,22 @@
     name: quota
     state: restarted
 
-- name: quotaon check
+- name: "quotaon check {{ quota_dir | default('/home') }}"
   command: "quotaon -pu {{ quota_dir | default('/home') }}"
   register: quota_check
-  changed_when: '"user quota on" not in quota_check.stdout'
+  changed_when: '"is on" not in quota_check.stdout'
 
-- name: quotaon
+- name: "quotaon {{ quota_dir | default('/home') }}"
   command: "quotaon {{ quota_dir | default('/home') }}"
   register: quota_quotaon
-  when: quota_installed.changed
+  when: '"is off" in quota_check.stdout' 
   failed_when: '"Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout'
 
-- name: quotaon re-check
+- name: "quotaon check {{ quota_dir | default('/home') }}"
   command: "quotaon -pu {{ quota_dir | default('/home') }}"
   register: quota_check
   when: quota_quotaon.changed
-  changed_when: '"user quota on" not in quota_check.stdout'
+  changed_when: '"is on" not in quota_check.stdout'
   failed_when: '"is off" in quota_quotaon.stdout'
 
 - name: Quota warning config in place
