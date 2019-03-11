@@ -45,6 +45,13 @@
   when: quota_installed.changed
   failed_when: '"Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout'
 
+- name: quotaon re-check
+  command: "quotaon -pu {{ quota_dir | default('/home') }}"
+  register: quota_check
+  when: quota_quotaon.changed
+  changed_when: '"user quota on" not in quota_check.stdout'
+  failed_when: '"is off" in quota_quotaon.stdout' 
+
 - name: Quota warning config in place
   template:
     src: templates/warnquota.conf.j2
