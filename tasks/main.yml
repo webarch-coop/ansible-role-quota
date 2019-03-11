@@ -44,6 +44,7 @@
 
 - name: "quotaon check {{ quota_dir | default('/home') }}"
   command: "quotaon -pu {{ quota_dir | default('/home') }}"
+  ignore_errors: yes
   register: quota_check
   changed_when: '"is on" not in quota_check.stdout'
 
