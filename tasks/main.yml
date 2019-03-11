@@ -50,7 +50,7 @@
 - name: "quotaon {{ quota_dir | default('/home') }}"
   command: "quotaon {{ quota_dir | default('/home') }}"
   register: quota_quotaon
-  when: '"is off" in quota_check.stdout' 
+  when: '"is off" in quota_check.stdout'
   failed_when: '"Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout'
 
 - name: "quotaon check {{ quota_dir | default('/home') }}"
