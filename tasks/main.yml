@@ -47,7 +47,7 @@
   register: quota_check
   changed_when: '"user quota on" not in quota_check.stdout'
 
-- name: quotaon 
+- name: quotaon
   command: "quotaon {{ quota_dir | default('/home') }}"
   register: quota_quotaon
   when: quota_installed.changed
@@ -58,7 +58,7 @@
   register: quota_check
   when: quota_quotaon.changed
   changed_when: '"user quota on" not in quota_check.stdout'
-  failed_when: '"is off" in quota_quotaon.stdout' 
+  failed_when: '"is off" in quota_quotaon.stdout'
 
 - name: Quota warning config in place
   template:
