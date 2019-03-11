@@ -34,7 +34,12 @@
     access_time: preserve
     modification_time: preserve
 
-- name: Quota on
+- name: quotaon check
+  command: "quotaon -pu {{ quota_dir | default('/home') }}"
+  register: quota_check
+  changed_when: '"user quota on" not in quota_check.stdout'
+
+- name: quotaon 
   command: "quotaon {{ quota_dir | default('/home') }}"
   register: quota_quotaon
   when: quota_installed.changed
@@ -45,11 +50,6 @@
     src: templates/warnquota.conf.j2
     dest: /etc/warnquota.conf
     backup: true
-
-- name: Quota check
-  command: "quotaon -pu {{ quota_dir | default('/home') }}"
-  register: quota_check
-  failed_when: '"user quota on" not in quota_check.stdout'
 
 - name: Warn that a reboot might be needed
   debug:
