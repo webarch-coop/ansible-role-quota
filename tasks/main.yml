@@ -27,6 +27,13 @@
     line: "{{ quota_filesystem.stdout }}:{{ quota_dir_name | default('home') }}"
     state: present
 
+- name: "Touch {{ quota_dir_name | default('home') }}/aquota.user"
+  file:
+    path: "{{ quota_dir_name | default('home') }}/aquota.user"
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+
 - name: Quota on
   command: "quotaon {{ quota_dir | default('/home') }}"
   register: quota_quotaon
