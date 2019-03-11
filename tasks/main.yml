@@ -33,6 +33,14 @@
     state: touch
     access_time: preserve
     modification_time: preserve
+    owner: root
+    group: root
+    mode: 0600
+
+  - name: Quota restarted
+    service:
+      name: quota
+      state: restarted
 
 - name: quotaon check
   command: "quotaon -pu {{ quota_dir | default('/home') }}"
