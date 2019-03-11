@@ -8,7 +8,7 @@
   register: quota_filesystem
 
 - name: Get the mount options
-  shell: "cat /proc/mounts | egrep '[[:space:]]{{ quota_dir | default('/home') }}[[:space:]]' | awk '{ print $4 }'" 
+  shell: "cat /proc/mounts | egrep '[[:space:]]{{ quota_dir | default('/home') }}[[:space:]]' | awk '{ print $4 }'"
   register: quota_mount_options
   failed_when: '"quota" not in quota_mount_options.stdout'
 
@@ -21,7 +21,7 @@
     update_cache: true
   register: quota_installed
 
-- name: quota_dir listed in /etc/quotatab 
+- name: quota_dir listed in /etc/quotatab
   lineinfile:
     dest: /etc/quotatab
     line: "{{ quota_filesystem.stdout }}:{{ quota_dir_name | default('home') }}"
