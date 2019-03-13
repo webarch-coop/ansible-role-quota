@@ -2,15 +2,18 @@
 - name: Check that the quota_dir directory is on a partition
   command: "mountpoint {{ quota_dir | default('/home') }}"
   register: quota_dir_mountpoint
+  changed_when: false
 
 - name: Get the partition filesystem
   shell: "df -P {{ quota_dir | default('/home') }} | tail -1 | awk '{ print $1 }'"
   register: quota_filesystem
+  changed_when: false
 
 - name: Get the mount options
   shell: "cat /proc/mounts | egrep '[[:space:]]{{ quota_dir | default('/home') }}[[:space:]]' | awk '{ print $4 }'"
   register: quota_mount_options
   failed_when: '"quota" not in quota_mount_options.stdout'
+  changed_when: false
 
 - name: Quota and quotatool present
   apt:
@@ -26,6 +29,7 @@
     dest: /etc/quotatab
     line: "{{ quota_filesystem.stdout }}:{{ quota_dir_name | default('home') }}"
     state: present
+  register: quote_quotatab
 
 - name: "Touch {{ quota_dir_name | default('home') }}/aquota.user"
   file:
@@ -36,15 +40,16 @@
     owner: root
     group: root
     mode: 0600
+  register: quote_aquota
 
 - name: Quota restarted
   service:
     name: quota
     state: restarted
+  when: quota_installed.changed or quote_quotatab.changed or quote_aquota.changed
 
 - name: "quotaon check {{ quota_dir | default('/home') }}"
   shell: "! quotaon -pu {{ quota_dir | default('/home') }} 2>&1"
-  ignore_errors: true
   register: quota_check
   changed_when: '"is on" not in quota_check.stdout'
 
