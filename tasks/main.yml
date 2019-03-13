@@ -43,7 +43,7 @@
     state: restarted
 
 - name: "quotaon check {{ quota_dir | default('/home') }}"
-  shell: "quotaon -pu {{ quota_dir | default('/home') }} 2>&1"
+  shell: "! quotaon -pu {{ quota_dir | default('/home') }} 2>&1"
   ignore_errors: true 
   register: quota_check
   changed_when: '"is on" not in quota_check.stdout'
