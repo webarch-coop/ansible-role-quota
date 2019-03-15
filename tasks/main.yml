@@ -68,11 +68,11 @@
   failed_when: '"is off" in quota_quotaon.stdout'
 
 - name: "Read the grace times for {{ quota_dir | default('/home') }}"
-  command: "repquota {{ quota_dir | default('/home') }} | grep '^Block'" 
+  command: "repquota {{ quota_dir | default('/home') }} | grep '^Block'"
   register: quota_grace_times_before
   failed_when: false
 
-- name: "Set the gracetimes for {{ quota_dir | default('/home') }}" 
+- name: "Set the gracetimes for {{ quota_dir | default('/home') }}"
   command: "setquota -t {{ quota_grace_block | default('86400') }} {{ quota_grace_inode | default('86400') }} {{ quota_dir | default('/home') }} ; repquota {{ quota_dir | default('/home') }} | grep '^Block'"
   register: quota_grace_times_after
   changed_when: quota_grace_times_before.stdout != quota_grace_times_after.stdout
