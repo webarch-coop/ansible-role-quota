@@ -6,6 +6,8 @@ You can set these optional variables:
 
  * quota_dir
  * quota_name
+ * quota_grace_block
+ * quota_grace_inode
  * quota_warn_from
  * quota_warn_subject
  * quota_warn_cc
@@ -20,6 +22,8 @@ Example:
   vars:
     quota_dir: /home
     quota_name: home
+    quota_grace_block: 86400
+    quota_grace_inode: 86400
     quota_warn_from: support@webarchitects.coop
     quota_warn_subject: "[webarchitects] Webhosting disk quota usage warning"
     quota_warn_cc: root@localhost
