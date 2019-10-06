@@ -3,17 +3,23 @@
   command: "mountpoint {{ quota_dir | default('/home') }}"
   register: quota_dir_mountpoint
   changed_when: false
+  tags:
+    - quota
 
 - name: Get the partition filesystem
   shell: "df -P {{ quota_dir | default('/home') }} | tail -1 | awk '{ print $1 }'"
   register: quota_filesystem
   changed_when: false
+  tags:
+    - quota
 
 - name: Get the mount options
   shell: "cat /proc/mounts | egrep '[[:space:]]{{ quota_dir | default('/home') }}[[:space:]]' | awk '{ print $4 }'"
   register: quota_mount_options
   failed_when: '"quota" not in quota_mount_options.stdout'
   changed_when: false
+  tags:
+    - quota
 
 - name: Quota and quotatool present
   apt:
@@ -23,6 +29,8 @@
     state: present
     update_cache: true
   register: quota_installed
+  tags:
+    - quota
 
 - name: quota_dir listed in /etc/quotatab
   lineinfile:
@@ -30,6 +38,8 @@
     line: "{{ quota_filesystem.stdout }}:{{ quota_dir_name | default('home') }}"
     state: present
   register: quote_quotatab
+  tags:
+    - quota
 
 - name: "Touch {{ quota_dir_name | default('home') }}/aquota.user"
   file:
@@ -41,24 +51,32 @@
     group: root
     mode: 0600
   register: quote_aquota
+  tags:
+    - quota
 
 - name: Quota restarted
   service:
     name: quota
     state: restarted
   when: quota_installed.changed or quote_quotatab.changed or quote_aquota.changed
+  tags:
+    - quota
 
 - name: "quotaon check {{ quota_dir | default('/home') }}"
   shell: "! quotaon -pu {{ quota_dir | default('/home') }} 2>&1"
   ignore_errors: true
   register: quota_check
   changed_when: '"is on" not in quota_check.stdout'
+  tags:
+    - quota
 
 - name: "quotaon {{ quota_dir | default('/home') }}"
   command: "quotaon {{ quota_dir | default('/home') }}"
   register: quota_quotaon
   when: '"is off" in quota_check.stdout'
   failed_when: '"Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout'
+  tags:
+    - quota
 
 - name: "quotaon check {{ quota_dir | default('/home') }}"
   command: "quotaon -pu {{ quota_dir | default('/home') }}"
@@ -67,24 +85,35 @@
   when: quota_quotaon.changed
   changed_when: '"is on" not in quota_check.stdout'
   failed_when: '"is off" in quota_quotaon.stdout'
+  tags:
+    - quota
 
 - name: "Read the grace times for {{ quota_dir | default('/home') }}"
   shell: "repquota {{ quota_dir | default('/home') }} | grep '^Block'"
   register: quota_grace_times_before
   changed_when: false
+  tags:
+    - quota
 
 - name: "Set the gracetimes for {{ quota_dir | default('/home') }}"
   shell: "setquota -t {{ quota_grace_block | default('86400') }} {{ quota_grace_inode | default('86400') }} {{ quota_dir | default('/home') }} ; repquota {{ quota_dir | default('/home') }} | grep '^Block'"
   register: quota_grace_times_after
   changed_when: quota_grace_times_before.stdout != quota_grace_times_after.stdout
+  tags:
+    - quota
 
 - name: Quota warning config in place
   template:
     src: templates/warnquota.conf.j2
     dest: /etc/warnquota.conf
     backup: true
+  tags:
+    - quota
 
 - name: Warn that a reboot might be needed
   debug:
     msg: "You might need to reboot this server before the disk quotas are applied"
   when: quota_installed.changed
+  tags:
+    - quota
+...

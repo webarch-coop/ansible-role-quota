@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: quota
   author: Chris Croome
-  description: Ansible role for installing and settings disk quotas
+  description: Ansible role for installing and settings disk quotas on Debian
   company: Webarchitects Co-operative
   license: license (GPLv3)
   # which version was bytes_to_human and human_to_bytes merged into?
@@ -23,3 +23,4 @@ galaxy_info:
 dependencies: []
 # List your role dependencies here, one per line. Be sure to remove the '[]' above,
 # if you add dependencies to this list.
+...
