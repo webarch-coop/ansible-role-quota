@@ -1,6 +1,7 @@
 ---
 quota_dir: /home
 quota_name: home
+quota_warn: true
 quota_warn_from: root@localhost
 quota_warn_subject: Over quota
 quota_warn_cc: root@localhost

@@ -21,6 +21,12 @@
   tags:
     - quota
 
+- name: Debug the filesystem and mount options
+  debug:
+    msg:
+      - "quota_filesystem: {{ quota_filesystem.stdout }}"
+      - "quota_mount_options: {{ quota_mount_options.stdout }}"
+
 - name: Quota and quotatool present
   apt:
     pkg:
@@ -104,9 +110,15 @@
 
 - name: Quota warning config in place
   template:
-    src: templates/warnquota.conf.j2
+    src: warnquota.conf.j2
     dest: /etc/warnquota.conf
-    backup: true
+  tags:
+    - quota
+
+- name: Quota warning defaults in place
+  template:
+    src: quota.j2
+    dest: /etc/default/quota
   tags:
     - quota
 
