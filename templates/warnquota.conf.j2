@@ -8,10 +8,9 @@ PHONE           = "{{ quota_warn_phone }}"
 {% endif %}
 # see /usr/share/doc/quota/warnquota.conf
 {% if quota_warn_message %}
-MESSAGE         = "{{ quota_warn_message }}"
+MESSAGE         = "{{ quota_warn_message | regex_replace('\n', '|') }}"
 {% endif %}
 {% if quota_warn_signature %}
-SIGNATURE       = "{{ quota_warn_signature }}"
+SIGNATURE       = "{{ quota_warn_signature | regex_replace('\n', '|') }}"
 {% endif %}
 CHARSET         = UTF-8
-
