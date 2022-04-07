@@ -1,0 +1,7 @@
+---
+- name: Quota restarted
+  service:
+    name: quota
+    state: restarted
+    listen: Restart quota
+...

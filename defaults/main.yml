@@ -1,4 +1,5 @@
 ---
+quota: true
 quota_dir: /home
 quota_name: home
 quota_warn: true
