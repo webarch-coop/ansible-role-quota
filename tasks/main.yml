@@ -2,16 +2,12 @@
 - name: Install and enable or uninstall quota and quotatool
   block:
 
-    - name: Packages quota and quotatool installed and enabled
-      include_tasks: enabled.yml
+    - name: Packages quota and quotatool present
+      include_tasks: present.yml
       when: quota
 
-    - name: Packages quota and quotatool absent
-      apt:
-        pkg:
-          - quota
-          - quotatool
-        state: absent
+    - name: Packages quota and quotatool absent 
+      include_tasks: absent.yml
       when: not quota
 
   when: quota is defined
