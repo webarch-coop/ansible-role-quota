@@ -2,40 +2,6 @@
 - name: Enable and configue quotas
   block:
 
-    - name: Set quota_type to aquota when not defined and Debian is less than version 11
-      set_fact:
-        quota_type: journald
-      when: 
-        - quota_type is not defined
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '>=')
-
-    - name: Set quota_type to journald when not defined and Debian is version 11 or greater
-      set_fact:
-        quota_type: aquota
-      when: 
-        - quota_type is not defined
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '>=')
-
-    - name: Ensure that required variables are set
-      assert:
-        that:
-          - ( quota is defined ) and ( quota | debug_type == "bool" )
-          - ( quota_type is defined ) and ( ( quota_type == "aquota" ) or ( quota_type == "journald" ) )
-          - ( quota_dir is defined ) and ( quota_dir is regex('^//[a-zA-Z0-9//]{1,99}$') )
-          - ( quota_name is defined )
-          - ( quota_warn is defined ) and ( quota_warn | debug_type == "bool" )
-
-    - name: Ensure that quota warn variables are set
-      assert:
-        that:
-          - ( quota_warn_fromis defined )
-          - ( quota_warn_subjectis defined )
-          - ( quota_warn_ccis defined )
-          - ( quota_warn_supportis defined )
-      when: quota_warn is defined
-
     - name: Quota and quotatool present
       apt:
         pkg:
@@ -44,11 +10,22 @@
         state: present
         update_cache: true
 
+    - name: Include journaled tasks for Debian Bullseye and greater
+      include_tasks: journaled.yml
+      when:
+        - ansible_distribution_file_variety == "Debian"
+        - ansible_distribution_major_version is version('11', '>=')
+
+    - name: Include aquota tasks for Debian Buter and Stretch
+      include_tasks: journaled.yml
+      when:
+        - ansible_distribution_file_variety == "Debian"
+        - ansible_distribution_major_version is version('11', '<')
+
     - name: "Check that {{ quota_dir }} is a partition" 
       command: "mountpoint {{ quota_dir }}"
       check_mode: false
       changed_when: false
-      ignore_errors: "{{ ansible_check_mode }}"
       register: quota_dir_mountpoint
 
     - name: "Get the partition filesystem for {{ quota_dir }}"
@@ -77,25 +54,22 @@
         var: quota_mount_options
         verbosity: 2
 
-    - name: Include journaled tasks for Debian Bullseye and greater
-      include_tasks: journaled.yml
-      when: >
-        ( ( ansible_distribution_file_variety == "Debian" ) and ( 
-        ( ansible_distribution_major_version is version('11', '>=') ) ) or
-        ( quota_type == "journaled" )
-
-    - name: Include aquota tasks for Debian Buter and Stretch
-      include_tasks: journaled.yml
-      when:
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '<')
-
     - name: "{{ {{ quota_filesystem }}:{{ quota_dir_name }} present in /etc/quotatab"
       lineinfile:
         dest: /etc/quotatab
         line: "{{ quota_filesystem }}:{{ quota_dir_name }}"
         state: present
       notify: Restart quota
+
+    - name: "Touch {{ quota_dir }}/aquota.user"
+      file:
+        path: "{{ quota_dir }}/aquota.user"
+        state: touch
+        access_time: preserve
+        modification_time: preserve
+        owner: root
+        group: root
+        mode: 0600
 
     - name: Quota enabled and running
       service:

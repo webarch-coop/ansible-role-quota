@@ -3,7 +3,7 @@ galaxy_info:
   role_name: quota
   author: Chris Croome
   namespace: chriscroome
-  description: Ansible role for installing and settings disk quotas on Debian
+  description: Ansible role for enabling disk quotas on a filesystem on Debian
   company: Webarchitects Co-operative
   license: GNU General Public License v3.0 (GPLv3)
   min_ansible_version: 2.9

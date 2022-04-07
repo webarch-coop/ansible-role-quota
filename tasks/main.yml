@@ -4,13 +4,12 @@
 
     - name: Packages quota and quotatool present
       include_tasks: present.yml
-      when: quota
+      when: ( quota is defined ) and ( quota )
 
     - name: Packages quota and quotatool absent 
       include_tasks: absent.yml
-      when: not quota
+      when: ( quota is not defined ) or ( not quota )
 
-  when: quota is defined
   tags:
     - quota
 ...

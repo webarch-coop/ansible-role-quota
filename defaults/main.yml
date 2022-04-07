@@ -1,5 +1,6 @@
 ---
 quota: true
+# quota_type: aquota | journald
 quota_dir: /home
 quota_name: home
 quota_warn: true
