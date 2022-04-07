@@ -1,6 +1,6 @@
 ---
 - name: Install and enable or uninstall quota and quotatool
-  tasks:
+  block:
 
     - name: Packages quota and quotatool installed and enabled
       include_tasks: enabled.yml
