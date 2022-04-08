@@ -83,7 +83,7 @@
     - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
       set_fact:
         quota_type: "aquota"
-      when: ( "usrjquota=aquota.user" in quota_device_options
+      when: ( "usrjquota=aquota.user" in quota_device_options )
       loop: "{{ quota_device_options }}"
       loop_control:
         loop_var: opt
