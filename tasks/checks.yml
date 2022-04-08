@@ -81,23 +81,24 @@
         verbosity: 2
 
     - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
-      set_fact:
+      ansible.builtin.set_fact:
         quota_type: "aquota"
       when: ( "usrjquota=aquota.user" in quota_device_options )
       loop: "{{ quota_device_options }}"
       loop_control:
-        loop_var: opt
-        label: "option {{ ansible_loop.index }}"
-
-    - name: "Loop through the {{ quota_device }} features to check if quota is present"
-      set_fact:
-        quota_type: "aquota"
-      when: ( "usrjquota=aquota.user" in quota_device_options
-      loop: "{{ quota_device_options }}"
-      loop_control:
         extended: true
         loop_var: opt
-        label: "option {{ ansible_loop.index }}"
+        # label: "option {{ ansible_loop.index }}"
+
+    - name: "Loop through the {{ quota_device }} features to check if quota is present"
+      ansible.builtin.set_fact:
+        quota_type: "journald"
+      when: ( "quota" in quota_device_features )
+      loop: "{{ quota_device_features }}"
+      loop_control:
+        extended: true
+        loop_var: feat
+        # label: "feature {{ ansible_loop.index }}"
 
 #    - name: "Check {{ quota_dir }} using quotaon"
 #      command: "quotaon -pu {{ quota_dir }}"
