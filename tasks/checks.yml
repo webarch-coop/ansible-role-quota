@@ -33,9 +33,9 @@
           quota_device_options: ""
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
-        set_fact:
-          quota_device: "{{ mnt.device }}"
-          quota_device_options: "{{ mnt.options }}"
+      set_fact:
+        quota_device: "{{ mnt.device }}"
+        quota_device_options: "{{ mnt.options }}"
       when: mnt.mount == quota_dir
       loop: "{{ ansible_facts.mounts }}"
       loop_control:
