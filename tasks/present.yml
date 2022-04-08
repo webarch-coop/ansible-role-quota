@@ -2,7 +2,7 @@
 - name: Enable and configue quotas
   block:
 
-    - name: Set quota_type to aquota when not defined and Debian is less than version 11
+    - name: Set quota_type_supported to aquota when not defined and Debian is less than version 11
       set_fact:
         quota_type: journald
       when: 
@@ -10,7 +10,7 @@
         - ansible_distribution_file_variety == "Debian"
         - ansible_distribution_major_version is version('11', '>=')
 
-    - name: Set quota_type to journald when not defined and Debian is version 11 or greater
+    - name: Set quota_type_supported to journald when not defined and Debian is version 11 or greater
       set_fact:
         quota_type: aquota
       when: 
@@ -70,25 +70,38 @@
       command: "findmnt -fno OPTIONS --source {{ quota_filesystem }}"
       check_mode: false
       changed_when: false
-      register: quota_mount_options
+      register: quota_findmnt_options
 
-    - name: Debug mount options
+    - name: Debug findmnt options
+      debug:
+        var: quota_findmnt_options.stdout
+        verbosity: 2
+
+    - name: "Set an array for the findmnt options for {{ quota_filesystem }}"
+      set_fact:
+        quota_mount_options: "{{ (quota_findmnt_options.stdout).split(',') | list }}"
+
+    - name: "Debug {{ quota_filesystem }} mount options array"
       debug:
         var: quota_mount_options
         verbosity: 2
 
-    - name: Include journaled tasks for Debian Bullseye and greater
-      include_tasks: journaled.yml
-      when: >
-        ( ( ansible_distribution_file_variety == "Debian" ) and ( 
-        ( ansible_distribution_major_version is version('11', '>=') ) ) or
-        ( quota_type == "journaled" )
+    - name: Debian quota tasks
+      block:
 
-    - name: Include aquota tasks for Debian Buter and Stretch
+    - name: Include journaled tasks for Debian Bullseye and greater when aquota is not is use
       include_tasks: journaled.yml
       when:
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '<')
+        - ( ansible_distribution_major_version is version('11', '>=') )
+        - ( quota_type == "journaled" )
+        - ( "usrjquota=aquota.user" not in quota_mount_options )
+
+    - name: Include aquota tasks for Debian Buster and Stretch
+      include_tasks: aquota.yml
+      when:
+        - ( ansible_distribution_major_version is version('11', '<') ) or ( "usrjquota=aquota.user" in quota_mount_options )
+
+      when: ansible_distribution_file_variety == "Debian"
 
     - name: "{{ {{ quota_filesystem }}:{{ quota_dir_name }} present in /etc/quotatab"
       lineinfile:

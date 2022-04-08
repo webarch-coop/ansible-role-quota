@@ -1,0 +1,105 @@
+---
+- name: Check the quota status
+  block:
+
+    - name: Check that the OS is Debian Stretch or above
+      assert:
+        that:
+          - ansible_distribution_file_variety == "Debian"
+          - ansible_distribution_major_version is version('9', '>=')
+
+    - name: Ensure that required variables are set
+      assert:
+        that:
+          - ( quota is defined ) and ( quota | debug_type == "bool" )
+          # - ( quota_type is defined ) and ( ( quota_type == "aquota" ) or ( quota_type == "journald" ) )
+          - ( quota_dir is defined ) and ( quota_dir is regex('^//[a-zA-Z0-9//]{1,99}$') )
+          - ( quota_name is defined )
+          - ( quota_warn is defined ) and ( quota_warn | debug_type == "bool" )
+
+    - name: Ensure that quota warn variables are set
+      assert:
+        that:
+          - ( quota_warn_from is defined )
+          - ( quota_warn_subject is defined )
+          - ( quota_warn_cc is defined )
+          - ( quota_warn_support is defined )
+      when: quota_warn is defined
+
+    - name: Set empty variables for the quota type, device and device options
+      set_fact:
+          quota_type: ""
+          quota_device: ""
+          quota_device_options: ""
+
+    - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
+        set_fact:
+          quota_device: "{{ mnt.device }}"
+          quota_device_options: "{{ mnt.options }}"
+      when: mnt.mount == quota_dir
+      loop: "{{ ansible_facts.mounts }}"
+      loop_control:
+        loop_var: mnt
+        label: "{{ mnt.mount }}"
+
+    - name: "Ensure that the device and device options for {{ quota_dir }} are not empty"
+      assert:
+        that:
+          - quota_device | length > 0
+          - quota_device_options | length > 0
+        fail_msg:
+          - "It appears that {{ quota_dir }} is not a seperate disk, it needs to be one for quotas to be configured"
+          - "you can manually check the device and device options using the following command"
+          - "findmnt -fno SOURCE,OPTIONS --target {{ quota_dir }}"
+
+    - name: "Debug quota {{ quota_dir }} device"
+      debug:
+        var: quota_device
+        verbosity: 2
+
+    - name: "Debug {{ quota_device }} mount options array"
+      debug:
+        var: quota_device_options
+        verbosity: 2
+
+    - name: "Check the current values of the parameters that can be set by tune2fs for {{ quota_device }}"
+      comand: "tune2fs -l {{ quota_device }}"
+      register: quota_tune2fs
+
+    - name: "Loop through the filesystem features for {{ quota_device }} to set a variable containing an array of features"
+        set_fact:
+          quota_device_features: "{{ (line | regex_remove('^Filesystem features:\\s*')).split(',') | list }}"
+      when: line is regex('^Filesystem features:')
+      loop: "{{ quota_tune2fs.stdout_lines }}"
+      loop_control:
+        loop_var: line
+
+    - name: "Debug {{ quota_device }} mount options array"
+      debug:
+        var: quota_device_features
+        verbosity: 2
+
+#    - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
+#      set_fact:
+#        quota_type: ""
+#
+#      loop: "{{ quota_device_options.split(',') | list }}"
+#      loop_control:
+#        loop_var: opt
+#        label: "opt {{ ansible_loop.index }}"
+#
+#    - name: "Check {{ quota_dir }} using quotaon"
+#      command: "quotaon -pu {{ quota_dir }}"
+#      check_mode: false
+#      changed_when: false
+#      register: quota_quotaon
+#
+#    - name:
+#
+#      changed_when: '"is on" not in quota_check.stdout'
+#      failed_when: '"is off" in quota_quotaon.stdout'
+#
+
+  tags:
+    - quota
+...

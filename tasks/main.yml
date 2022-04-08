@@ -1,14 +1,17 @@
 ---
-- name: Install and enable or uninstall quota and quotatool
+- name: Check, install and enable or uninstall quota and quotatool
   block:
 
-    - name: Packages quota and quotatool present
-      include_tasks: present.yml
-      when: ( quota is defined ) and ( quota )
+    - name: Include quota checks
+      include_tasks: checks.yml
 
-    - name: Packages quota and quotatool absent 
-      include_tasks: absent.yml
-      when: ( quota is not defined ) or ( not quota )
+    # - name: Packages quota and quotatool present
+    #   include_tasks: present.yml
+    #   when: ( quota is defined ) and ( quota )
+
+    # - name: Packages quota and quotatool absent 
+    #   include_tasks: absent.yml
+    #   when: ( quota is not defined ) or ( not quota )
 
   tags:
     - quota
