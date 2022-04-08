@@ -3,13 +3,13 @@
   block:
 
     - name: Check that the OS is Debian Stretch or above
-      assert:
+      ansible.builtin.assert:
         that:
           - ansible_distribution_file_variety == "Debian"
           - ansible_distribution_major_version is version('9', '>=')
 
     - name: Ensure that required variables are set
-      assert:
+      ansible.builtin.assert:
         that:
           - ( quota is defined ) and ( quota | debug_type == "bool" )
           # - ( quota_type is defined ) and ( ( quota_type == "aquota" ) or ( quota_type == "journald" ) )
@@ -18,7 +18,7 @@
           - ( quota_warn is defined ) and ( quota_warn | debug_type == "bool" )
 
     - name: Ensure that quota warn variables are set
-      assert:
+      ansible.builtin.assert:
         that:
           - ( quota_warn_from is defined )
           - ( quota_warn_subject is defined )
@@ -27,13 +27,13 @@
       when: quota_warn is defined
 
     - name: Set empty variables for the quota type, device and device options
-      set_fact:
+      ansible.builtin.set_fact:
           quota_type: ""
           quota_device: ""
           quota_device_options: ""
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
-      set_fact:
+      ansible.builtin.set_fact:
         quota_device: "{{ mnt.device }}"
         quota_device_options: "{{ mnt.options }}"
       when: mnt.mount == quota_dir
@@ -43,7 +43,7 @@
         label: "{{ mnt.mount }}"
 
     - name: "Ensure that the device and device options for {{ quota_dir }} are not empty"
-      assert:
+      ansible.builtin.assert:
         that:
           - quota_device | length > 0
           - quota_device_options | length > 0
@@ -53,21 +53,21 @@
           - "findmnt -fno SOURCE,OPTIONS --target {{ quota_dir }}"
 
     - name: "Debug quota {{ quota_dir }} device"
-      debug:
+      ansible.builtin.debug:
         var: quota_device
         verbosity: 2
 
     - name: "Debug {{ quota_device }} mount options array"
-      debug:
+      ansible.builtin.debug:
         var: quota_device_options
         verbosity: 2
 
     - name: "Check the current values of the parameters that can be set by tune2fs for {{ quota_device }}"
-      comand: "tune2fs -l {{ quota_device }}"
+      ansible.builtin.command: "tune2fs -l {{ quota_device }}"
       register: quota_tune2fs
 
     - name: "Loop through the filesystem features for {{ quota_device }} to set a variable containing an array of features"
-      set_fact:
+      ansible.builtin.set_fact:
         quota_device_features: "{{ (line | regex_remove('^Filesystem features:\\s*')).split(',') | list }}"
       when: line is regex('^Filesystem features:')
       loop: "{{ quota_tune2fs.stdout_lines }}"
@@ -75,7 +75,7 @@
         loop_var: line
 
     - name: "Debug {{ quota_device }} mount options array"
-      debug:
+      ansible.builtin.debug:
         var: quota_device_features
         verbosity: 2
 
