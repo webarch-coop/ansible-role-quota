@@ -11,11 +11,11 @@
     - name: Ensure that required variables are set
       ansible.builtin.assert:
         that:
-          - ( quota is defined ) and ( quota | debug_type == "bool" )
+          - ( quota is defined ) and ( quota | type_debug == "bool" )
           # - ( quota_type is defined ) and ( ( quota_type == "aquota" ) or ( quota_type == "journald" ) )
           - ( quota_dir is defined ) and ( quota_dir is regex('^//[a-zA-Z0-9//]{1,99}$') )
           - ( quota_name is defined )
-          - ( quota_warn is defined ) and ( quota_warn | debug_type == "bool" )
+          - ( quota_warn is defined ) and ( quota_warn | type_debug == "bool" )
 
     - name: Ensure that quota warn variables are set
       ansible.builtin.assert:
