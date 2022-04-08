@@ -26,16 +26,17 @@
           - ( quota_warn_support is defined )
       when: quota_warn is defined
 
-    - name: Set empty variables for the quota type, device and device options
+    - name: Set empty variables for the quota type, device, device options and device features
       ansible.builtin.set_fact:
           quota_type: ""
           quota_device: ""
-          quota_device_options: ""
+          quota_device_options: []
+          quota_device_features: []
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
         quota_device: "{{ mnt.device }}"
-        quota_device_options: "{{ mnt.options }}"
+        quota_device_options: "{{ (mnt.options).split(',') | list }}"
       when: mnt.mount == quota_dir
       loop: "{{ ansible_facts.mounts }}"
       loop_control:
@@ -79,15 +80,24 @@
         var: quota_device_features
         verbosity: 2
 
-#    - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
-#      set_fact:
-#        quota_type: ""
-#
-#      loop: "{{ quota_device_options.split(',') | list }}"
-#      loop_control:
-#        loop_var: opt
-#        label: "opt {{ ansible_loop.index }}"
-#
+    - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
+      set_fact:
+        quota_type: "aquota"
+      when: ( "usrjquota=aquota.user" in quota_device_options
+      loop: "{{ quota_device_options }}"
+      loop_control:
+        loop_var: opt
+        label: "option {{ ansible_loop.index }}"
+
+    - name: "Loop through the {{ quota_device }} features to check if quota is present"
+      set_fact:
+        quota_type: "aquota"
+      when: ( "usrjquota=aquota.user" in quota_device_options
+      loop: "{{ quota_device_options }}"
+      loop_control:
+        loop_var: opt
+        label: "option {{ ansible_loop.index }}"
+
 #    - name: "Check {{ quota_dir }} using quotaon"
 #      command: "quotaon -pu {{ quota_dir }}"
 #      check_mode: false
