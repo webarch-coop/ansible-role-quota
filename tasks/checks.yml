@@ -68,7 +68,7 @@
 
     - name: "Loop through the filesystem features for {{ quota_device }} to set a variable containing an array of features"
       ansible.builtin.set_fact:
-        quota_device_features: "{{ (line | regex_replace('^Filesystem features:\\s*')).split(',') | list }}"
+        quota_device_features: "{{ (line | regex_replace('^Filesystem features:\\s*')).split(' ') | list }}"
       when: line is regex('^Filesystem features:')
       loop: "{{ quota_tune2fs.stdout_lines }}"
       loop_control:
