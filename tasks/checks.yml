@@ -95,6 +95,7 @@
       when: ( "usrjquota=aquota.user" in quota_device_options
       loop: "{{ quota_device_options }}"
       loop_control:
+        extended: true
         loop_var: opt
         label: "option {{ ansible_loop.index }}"
 
