@@ -13,7 +13,7 @@
         that:
           - ( quota is defined ) and ( quota | type_debug == "bool" )
           # - ( quota_type is defined ) and ( ( quota_type == "aquota" ) or ( quota_type == "journald" ) )
-          - ( quota_dir is defined ) and ( quota_dir is regex('^//[a-zA-Z0-9//]{1,99}$') )
+          - ( quota_dir is defined ) and ( quota_dir is regex('^\/[a-zA-Z0-9\/]{1,99}$') )
           - ( quota_name is defined )
           - ( quota_warn is defined ) and ( quota_warn | type_debug == "bool" )
 
