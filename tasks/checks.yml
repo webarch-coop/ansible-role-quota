@@ -128,11 +128,11 @@
       ansible.builtin.set_fact:
         quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}" 
 
-    
-
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
-        msg: "Device {{ quota_device }} mounted at {{ quota_dir }}{% if quota_enabled %} has quota enabled{% if quote_type is defined %} using{{ quota_type }}{% endif %}{% else %}doesn't have quota enabled{% endif %}"
+        msg:
+          - "Device {{ quota_device }} mounted at {{ quota_dir }}{% if quota_enabled %} has quota enabled{% if quote_type is defined %} using{{ quota_type }}{% endif %}{% else %}doesn't have quota enabled{% endif %}"
+          - "{{ quota_quotaon.stdout }}{% if quote_type is defined %} using {{ quota_type }}{% endif %}"
 
   tags:
     - quota
