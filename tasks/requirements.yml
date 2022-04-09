@@ -9,20 +9,12 @@
         - name: Required packages present
           apt:
             pkg:
-              - jq
-              - python3-pip
-              - python3-setuptools
+              - jc
               - quota
               - quotatool
-              - xsltproc
             state: present
             autoclean: true
             autoremove: true
-
-        - name: Python yq present
-          pip:
-            name: yq
-            state: present
 
         - name: Ansible facts.d directory present
           ansible.builtin.file:
@@ -33,7 +25,7 @@
             owner: root
             group: root
 
-        - name: repquota wrapper present
+        - name: Ansible local facts repquota script present
           ansible.builtin.template:
             src: repquota.fact.j2
             dest: /etc/ansible/facts.d/repquota.fact
@@ -41,26 +33,12 @@
             owner: root
             group: root
 
-        - name: XSLT stylesheet present
-          ansible.builtin.copy:
-            src: attributetoelement.xslt
-            dest: /etc/ansible/attributetoelement.xslt
-            mode: 0644
-            owner: root
-            group: root
-
       when: quota
 
-    - name: Files absent when not quota
+    - name: Ansible local facts repquota script absent when not quota
       file:
-        path: "{{ path }}"
+        path: /etc/ansible/facts.d/repquota.fact
         state: absent
-      loop:
-        - /etc/ansible/attributetoelement.xslt
-        - /etc/ansible/facts.d/repquota.fact
-      loop_control:
-        loop_var: path
-        label: "{{ path | basename }}"
       when: not quota
 
   tags:

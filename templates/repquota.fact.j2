@@ -4,6 +4,4 @@
 
 set -e -o pipefail
 
-# The XSLT used hase been copied from here
-# https://stackoverflow.com/a/10645490
-repquota {{ quota_dir }} -O xml | xsltproc /etc/ansible/attributetoelement.xslt - | xq -Mc '.repquota.Report'
+repquota "{{ quota_dir }}" -O csv | jc -m --csv
