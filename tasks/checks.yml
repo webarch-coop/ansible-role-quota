@@ -121,7 +121,7 @@
           Device {{ quota_device }} mounted at {{ quota_dir }} 
           {% if quota_enabled %}has quota enabled
           {% if quote_type is defined %}using {{ quota_type }}{% endif %}
-          %{ else %}doesn't have quota enabled{% endif %}
+          {% else %}doesn't have quota enabled{% endif %}
 
   tags:
     - quota
