@@ -27,10 +27,10 @@
 
     - name: Set empty variables for the quota type, device, device options and device features
       ansible.builtin.set_fact:
-          quota_type: ""
-          quota_device: ""
-          quota_device_options: []
-          quota_device_features: []
+        quota_type: ""
+        quota_device: ""
+        quota_device_options: []
+        quota_device_features: []
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
@@ -128,7 +128,7 @@
 
     - name: "Set quota_enabled variable for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}" 
+        quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}"
 
     - name: "Ensure that quota_type is valid if defined for {{ quota_dir }}"
       ansible.builtin.assert:

@@ -5,7 +5,7 @@
     - name: Include requirements
       ansible.builtin.include_tasks: requirements.yml
 
-    - name: Configure quota tasks 
+    - name: Configure quota tasks
       block:
 
         - name: Include quota check tasks
