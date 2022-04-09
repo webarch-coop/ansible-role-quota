@@ -128,6 +128,17 @@
       ansible.builtin.set_fact:
         quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}" 
 
+    - name: "Ensure that quota_type is valid if defined for {{ quota_dir }}"
+      ansible.builtin.assert:
+        that:
+          - ( quota_type == "aquota" ) or ( quota_type == "journald" )
+      when: quota_type is defined
+
+    - name: "Ensure that quota_enabled is defined and a booolean for {{ quota_dir }}"
+      ansible.builtin.assert:
+        that:
+          - ( quota_enabled is defined ) and ( quota_enabled | type_debug == "bool" )
+
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
         msg:
