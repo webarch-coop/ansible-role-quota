@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+# TODO the following results in horrible looking JSON this could be made a lot better
+#      using some jq filters...
+repquota {{ quota_dir }} | -O xml | xq -Mc

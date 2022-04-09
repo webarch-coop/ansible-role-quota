@@ -21,6 +21,14 @@
         owner: root
         group: root
 
+    - name: repquota wrapper present
+      template:
+        src: repquota.fact.j2
+        dest: /etc/ansible/facts.d/repquota.fact
+        mode: 0700
+        owner: root
+        group: root
+
   tags:
     - quota
 ...
