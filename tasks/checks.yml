@@ -104,7 +104,7 @@
         quota_type: "{% if quota_type_aquota %}aquota{% elif quota_type_journald %}journald{% endif %}"
       when: >
          ( ( quota_type_aquota is defined ) and ( quota_type_aquota ) or
-         ( ( quota_type_journald is defined ) and ( quota_type_journald ) )
+         ( quota_type_journald is defined ) and ( quota_type_journald ) )
 
     - name: "Check {{ quota_dir }} using quotaon"
       ansible.builtin.command: "quotaon -pu {{ quota_dir }}"
