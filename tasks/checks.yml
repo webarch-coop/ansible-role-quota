@@ -131,8 +131,14 @@
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
         msg:
-          - "Device {{ quota_device }} mounted at {{ quota_dir }}{% if quota_enabled %} has quota enabled{% if quote_type is defined %} using{{ quota_type }}{% endif %}{% else %}doesn't have quota enabled{% endif %}"
-          - "{{ quota_quotaon.stdout }}{% if quote_type is defined %} using {{ quota_type }}{% endif %}"
+          - "{{ quota_quotaon.stdout }} using {{ quota_type }}"
+      when: quota_type is defined
+
+    - name: "Debug check results for {{ quota_dir }}"
+      ansible.builtin.debug:
+        msg:
+          - "{{ quota_quotaon.stdout }}"
+      when: quota_type is not defined
 
   tags:
     - quota
