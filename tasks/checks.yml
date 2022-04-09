@@ -64,6 +64,8 @@
 
     - name: "Check the current values of the parameters that can be set by tune2fs for {{ quota_device }}"
       ansible.builtin.command: "tune2fs -l {{ quota_device }}"
+      check_mode: false
+      changed_when: false
       register: quota_tune2fs
 
     - name: "Loop through the filesystem features for {{ quota_device }} to set a variable containing an array of features"

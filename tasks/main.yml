@@ -2,6 +2,9 @@
 - name: Check, install and enable or uninstall quota and quotatool
   block:
 
+    - name: Include repquota output for Ansible local facts
+      include_tasks: facts.yml
+
     - name: Include quota checks
       include_tasks: checks.yml
 

@@ -1,8 +1,7 @@
 ---
 quota: true
-# quota_type: aquota | journald
 quota_dir: /home
-quota_name: home
+quota_name: "{{ quota_dir | regex_replace('^\/') }}"
 quota_warn: true
 quota_warn_from: root@localhost
 quota_warn_subject: Over quota

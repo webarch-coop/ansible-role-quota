@@ -9,55 +9,12 @@
           - quotatool
         state: present
         update_cache: true
+      notify: Restart quota
 
-    - name: Include journaled tasks for Debian Bullseye and greater
-      include_tasks: journaled.yml
-      when:
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '>=')
-
-    - name: Include aquota tasks for Debian Buter and Stretch
-      include_tasks: journaled.yml
-      when:
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '<')
-
-    - name: "Check that {{ quota_dir }} is a partition" 
-      command: "mountpoint {{ quota_dir }}"
-      check_mode: false
-      changed_when: false
-      register: quota_dir_mountpoint
-
-    - name: "Get the partition filesystem for {{ quota_dir }}"
-      command: "df -P {{ quota_dir }}"
-      check_mode: false
-      changed_when: false
-      register: quota_df
-
-    - name: "Set a variable for the quota filesystem for {{ quota_dir }}"
-      set_fact:
-        quota_filesystem: "{{ quota_df.stdout_lines[1].split(' ')[0] }}"
-
-    - name: Debug quota partition
-      debug:
-        var: quota_filesystem
-        verbosity: 2
-
-    - name: "Get the mount options for {{ quota_filesystem }}"
-      command: "findmnt -fno OPTIONS --source {{ quota_filesystem }}"
-      check_mode: false
-      changed_when: false
-      register: quota_mount_options
-
-    - name: Debug mount options
-      debug:
-        var: quota_mount_options
-        verbosity: 2
-
-    - name: "{{ {{ quota_filesystem }}:{{ quota_dir_name }} present in /etc/quotatab"
+    - name: "{{ quota_device }}:{{ quota_dir_name }} present in /etc/quotatab"
       lineinfile:
         dest: /etc/quotatab
-        line: "{{ quota_filesystem }}:{{ quota_dir_name }}"
+        line: "{{ quota_device }}:{{ quota_dir_name }}"
         state: present
       notify: Restart quota
 
@@ -70,33 +27,20 @@
         owner: root
         group: root
         mode: 0600
+      notify: Restart quota
 
     - name: Quota enabled and running
       service:
         name: quota
         state: started
 
-    - name: "quotaon check {{ quota_dir }}"
-      command: "quotaon -vpu {{ quota_dir }}"
-      changed_when: false
-      
-      register: quota_check
-
-    - name: "quotaon {{ quota_dir | default('/home') }}"
-      command: "quotaon {{ quota_dir | default('/home') }}"
+    - name: "Run quotaon {{ quota_dir }}"
+      command: "quotaon {{ quota_dir }}"
       register: quota_quotaon
-      when: '"is off" in quota_check.stdout'
-      failed_when: '"Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout'
+      when: not quota_enabled
+      failed_when: ( "Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout )
 
-    - name: "quotaon check {{ quota_dir | default('/home') }}"
-      command: "quotaon -pu {{ quota_dir | default('/home') }}"
-      ignore_errors: true
-      register: quota_check
-      when: quota_quotaon.changed
-      changed_when: '"is on" not in quota_check.stdout'
-      failed_when: '"is off" in quota_quotaon.stdout'
-
-    - name: "Read the grace times for {{ quota_dir | default('/home') }}"
+    - name: "Read the grace times for {{ quota_dir }}"
       shell: "repquota {{ quota_dir | default('/home') }} | grep '^Block'"
       register: quota_grace_times_before
       changed_when: false

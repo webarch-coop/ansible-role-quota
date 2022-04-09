@@ -1,6 +1,6 @@
 ## Ansible Quota Role
 
-This role currently only works with users quotas, not groups or projects, using aquota, support for journald quotas should be added in the future.
+This role currently only works with users quotas, not groups or projects, using aquota, quota version 2 on non-XFS filesystems, support for journald quotas should be added in the future.
 
 The `quota_dir` has to be a partition and this role will fail if it isn't, it defaults to `/home`.
 

@@ -2,106 +2,15 @@
 - name: Enable and configue quotas
   block:
 
-    - name: Set quota_type_supported to aquota when not defined and Debian is less than version 11
-      set_fact:
-        quota_type: journald
-      when: 
-        - quota_type is not defined
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '>=')
-
-    - name: Set quota_type_supported to journald when not defined and Debian is version 11 or greater
-      set_fact:
-        quota_type: aquota
-      when: 
-        - quota_type is not defined
-        - ansible_distribution_file_variety == "Debian"
-        - ansible_distribution_major_version is version('11', '>=')
-
-    - name: Ensure that required variables are set
-      assert:
-        that:
-          - ( quota is defined ) and ( quota | debug_type == "bool" )
-          - ( quota_type is defined ) and ( ( quota_type == "aquota" ) or ( quota_type == "journald" ) )
-          - ( quota_dir is defined ) and ( quota_dir is regex('^//[a-zA-Z0-9//]{1,99}$') )
-          - ( quota_name is defined )
-          - ( quota_warn is defined ) and ( quota_warn | debug_type == "bool" )
-
-    - name: Ensure that quota warn variables are set
-      assert:
-        that:
-          - ( quota_warn_fromis defined )
-          - ( quota_warn_subjectis defined )
-          - ( quota_warn_ccis defined )
-          - ( quota_warn_supportis defined )
-      when: quota_warn is defined
-
-    - name: Quota and quotatool present
-      apt:
-        pkg:
-          - quota
-          - quotatool
-        state: present
-        update_cache: true
-
-    - name: "Check that {{ quota_dir }} is a partition" 
-      command: "mountpoint {{ quota_dir }}"
-      check_mode: false
-      changed_when: false
-      ignore_errors: "{{ ansible_check_mode }}"
-      register: quota_dir_mountpoint
-
-    - name: "Get the partition filesystem for {{ quota_dir }}"
-      command: "df -P {{ quota_dir }}"
-      check_mode: false
-      changed_when: false
-      register: quota_df
-
-    - name: "Set a variable for the quota filesystem for {{ quota_dir }}"
-      set_fact:
-        quota_filesystem: "{{ quota_df.stdout_lines[1].split(' ')[0] }}"
-
-    - name: Debug quota partition
-      debug:
-        var: quota_filesystem
-        verbosity: 2
-
-    - name: "Get the mount options for {{ quota_filesystem }}"
-      command: "findmnt -fno OPTIONS --source {{ quota_filesystem }}"
-      check_mode: false
-      changed_when: false
-      register: quota_findmnt_options
-
-    - name: Debug findmnt options
-      debug:
-        var: quota_findmnt_options.stdout
-        verbosity: 2
-
-    - name: "Set an array for the findmnt options for {{ quota_filesystem }}"
-      set_fact:
-        quota_mount_options: "{{ (quota_findmnt_options.stdout).split(',') | list }}"
-
-    - name: "Debug {{ quota_filesystem }} mount options array"
-      debug:
-        var: quota_mount_options
-        verbosity: 2
-
-    - name: Debian quota tasks
-      block:
-
     - name: Include journaled tasks for Debian Bullseye and greater when aquota is not is use
       include_tasks: journaled.yml
       when:
         - ( ansible_distribution_major_version is version('11', '>=') )
-        - ( quota_type == "journaled" )
-        - ( "usrjquota=aquota.user" not in quota_mount_options )
+        - ( quota_type is not defined ) or ( quota_type == "journaled" )
 
-    - name: Include aquota tasks for Debian Buster and Stretch
+    - name: Include aquota tasks for Debian Buster and Stretch of when aquota is in use
       include_tasks: aquota.yml
-      when:
-        - ( ansible_distribution_major_version is version('11', '<') ) or ( "usrjquota=aquota.user" in quota_mount_options )
-
-      when: ansible_distribution_file_variety == "Debian"
+      when: ( ansible_distribution_major_version is version('11', '<') ) or ( (  quota_type is defined ) and ( quota_type == "aquota" ) )
 
     - name: "{{ {{ quota_filesystem }}:{{ quota_dir_name }} present in /etc/quotatab"
       lineinfile:
@@ -118,7 +27,6 @@
     - name: "quotaon check {{ quota_dir }}"
       command: "quotaon -vpu {{ quota_dir }}"
       changed_when: false
-      
       register: quota_check
 
     - name: "quotaon {{ quota_dir | default('/home') }}"

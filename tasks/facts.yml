@@ -1,0 +1,26 @@
+---
+- name: Enable repquota output to be loaded as ansible_local facts
+  block:
+
+    - name: Packages present
+      apt:
+        pkg:
+          - jq
+          - python3-pip
+          - python3-setuptools
+
+    - name: Python yq present
+      pip:
+        name: yq
+
+    - name: Ansible facts.d directory present
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+        mode: 0700
+        owner: root
+        group: root
+
+  tags:
+    - quota
+...
