@@ -1,5 +1,5 @@
 ---
-- name: Enable repquota output to be loaded as ansible_local facts
+- name: Enable repquota output to be reported in ansible_local facts
   block:
 
     - name: Packages present
