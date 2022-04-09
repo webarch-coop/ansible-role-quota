@@ -16,8 +16,18 @@
     - name: Ansible facts.d directory present
       file:
         path: /etc/ansible/facts.d
+        recurse: true
         state: directory
         mode: 0700
+        owner: root
+        group: root
+
+    # https://stackoverflow.com/a/10645490
+    - name: XSLT stylesheet present
+      copy:
+        src: attributetoelement.xslt
+        dest: /etc/ansible/attributetoelement.xslt
+        mode: 0644
         owner: root
         group: root
 
