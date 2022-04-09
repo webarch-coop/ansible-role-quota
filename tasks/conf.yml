@@ -57,11 +57,17 @@
       template:
         src: warnquota.conf.j2
         dest: /etc/warnquota.conf
+        mode: 0644
+        owner: root
+        group: root
 
     - name: Quota warning defaults in place
       template:
         src: quota.j2
         dest: /etc/default/quota
+        mode: 0644
+        owner: root
+        group: root
 
     - name: Warn that a reboot might be needed
       debug:
