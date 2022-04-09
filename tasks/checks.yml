@@ -104,6 +104,7 @@
       check_mode: false
       changed_when: false
       register: quota_quotaon
+      failed_when: quota_quotaon.rc is not regex('0|1')
 
     - name: "Debug the output from quotaon -pu {{ quota_dir }}"
       ansible.builtin.debug:
