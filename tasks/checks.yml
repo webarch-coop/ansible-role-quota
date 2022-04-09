@@ -12,7 +12,6 @@
       ansible.builtin.assert:
         that:
           - ( quota is defined ) and ( quota | type_debug == "bool" )
-          # - ( quota_type is defined ) and ( ( quota_type == "aquota" ) or ( quota_type == "journald" ) )
           - ( quota_dir is defined ) and ( quota_dir is regex('^\/[a-zA-Z0-9\/]{1,99}$') )
           - ( quota_name is defined )
           - ( quota_warn is defined ) and ( quota_warn | type_debug == "bool" )
@@ -100,17 +99,19 @@
         loop_var: feat
         label: "feature {{ ansible_loop.index }}"
 
-#    - name: "Check {{ quota_dir }} using quotaon"
-#      command: "quotaon -pu {{ quota_dir }}"
-#      check_mode: false
-#      changed_when: false
-#      register: quota_quotaon
-#
-#    - name:
-#
+    - name: "Check {{ quota_dir }} using quotaon"
+      ansible.builtin.command: "quotaon -pu {{ quota_dir }}"
+      check_mode: false
+      changed_when: false
+      register: quota_quotaon
+
+    - name: "Debug the output from quotaon -pu {{ quota_dir }}"
+      ansible.builtin.debug:
+        var: quota_quotaon.stdout
+        verbosity: 2
+
 #      changed_when: '"is on" not in quota_check.stdout'
 #      failed_when: '"is off" in quota_quotaon.stdout'
-#
 
   tags:
     - quota
