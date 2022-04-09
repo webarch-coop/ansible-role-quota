@@ -111,8 +111,17 @@
         var: quota_quotaon.stdout
         verbosity: 2
 
-#      changed_when: '"is on" not in quota_check.stdout'
-#      failed_when: '"is off" in quota_quotaon.stdout'
+    - name: "Set quota_enabled variable for {{ quota_dir }}"
+      set_fact:
+        quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}" 
+
+    - name: "Debug check results for {{ quota_dir }}"
+      debug:
+        msg: >
+          Device {{ quota_device }} mounted at {{ quota_dir }} 
+          {% if quota_enabled %}has quota enabled
+          {% if quote_type is defined %}using {{ quota_type }}{% endif %}
+          %{ else %}doesn't have quota enabled{% endif %}
 
   tags:
     - quota
