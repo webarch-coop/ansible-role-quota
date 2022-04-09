@@ -81,7 +81,7 @@
 
     - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
       ansible.builtin.set_fact:
-        quota_type: "aquota"
+        quota_type_aquota: true
       when: opt == "usrjquota=aquota.user"
       loop: "{{ quota_device_options }}"
       loop_control:
@@ -91,13 +91,20 @@
 
     - name: "Loop through the {{ quota_device }} features to check if quota is present"
       ansible.builtin.set_fact:
-        quota_type: "journald"
+        quota_type_journald: true
       when: feat == "quota"
       loop: "{{ quota_device_features }}"
       loop_control:
         extended: true
         loop_var: feat
         label: "feature {{ ansible_loop.index }}"
+
+    - name: "Set a fact for the quota type for {{ quota_device }}"
+      ansible.builtin.set_fact:
+        quota_type: "{% if quota_type_aquota %}aquota{% elif quota_type_journald %}journald{% endif %}"
+      when: >
+         ( ( quota_type_aquota is defined ) and ( quota_type_aquota ) or
+         ( ( quota_type_journald is defined ) and ( quota_type_journald ) )
 
     - name: "Check {{ quota_dir }} using quotaon"
       ansible.builtin.command: "quotaon -pu {{ quota_dir }}"
@@ -112,12 +119,12 @@
         verbosity: 2
 
     - name: "Set quota_enabled variable for {{ quota_dir }}"
-      set_fact:
+      ansible.builtin.set_fact:
         quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}" 
 
     - name: "Debug check results for {{ quota_dir }}"
-      debug:
-        msg: "Device {{ quota_device }} mounted at {{ quota_dir }} {% if quota_enabled %}has quota enabled {% if quote_type is defined %}using {{ quota_type }}{% endif %} {% else %}doesn't have quota enabled{% endif %}"
+      ansible.builtin.debug:
+        msg: "Device {{ quota_device }} mounted at {{ quota_dir }} {% if quota_enabled %}has quota enabled{% if quote_type is defined %}using {{ quota_type }}{% endif %}{% else %}doesn't have quota enabled{% endif %}"
 
   tags:
     - quota
