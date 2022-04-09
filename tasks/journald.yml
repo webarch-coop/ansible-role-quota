@@ -1,7 +1,7 @@
 ---
 - name: Fail as journald quota support has yet to be implemented
   fail:
-    msg: "Sorry this Ansible role doesn't yet support journald see this comment for how to enable it https://unix.stackexchange.com/a/688093/390046"
+    msg: "Sorry this Ansible role doesn't yet support journald quota configuration, see this comment for how to enable it https://unix.stackexchange.com/a/688093/390046"
   tags:
     - quota
 ...

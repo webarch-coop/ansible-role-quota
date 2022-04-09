@@ -1,5 +1,5 @@
 ---
-- name: Enable and configue quotas
+- name: Enable and configure quotas
   block:
 
     - name: Include journaled tasks for Debian Bullseye and greater when aquota is not is use
@@ -8,7 +8,7 @@
         - ( ansible_distribution_major_version is version('11', '>=') )
         - ( quota_type is not defined ) or ( quota_type == "journaled" )
 
-    - name: Include aquota tasks for Debian Buster and Stretch of when aquota is in use
+    - name: Include aquota tasks for Debian Buster and Stretch or when aquota is in use
       include_tasks: aquota.yml
       when: ( ansible_distribution_major_version is version('11', '<') ) or ( (  quota_type is defined ) and ( quota_type == "aquota" ) )
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+{{ ansible_managed }}
+
 set -e -o pipefail
 
-# TODO the following results in horrible looking JSON this could be made a lot better
-#      using some jq filters...
+# The XSLT used hase been copied from here
+# https://stackoverflow.com/a/10645490
 repquota {{ quota_dir }} -O xml | xsltproc /etc/ansible/attributetoelement.xslt - | xq -Mc '.repquota.Report'

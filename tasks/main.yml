@@ -1,20 +1,27 @@
 ---
-- name: Check, install and enable or uninstall quota and quotatool
+- name: quota tasks
   block:
 
-    - name: Include repquota output for Ansible local facts
-      include_tasks: facts.yml
+    - name: Include requirements
+      ansible.builtin.include_tasks: requirements.yml
 
-    - name: Include quota checks
-      include_tasks: checks.yml
+    - name: Configure quota tasks 
+      block:
 
-    # - name: Packages quota and quotatool present
-    #   include_tasks: present.yml
-    #   when: ( quota is defined ) and ( quota )
+        - name: Include quota check tasks
+          ansible.builtin.include_tasks: checks.yml
 
-    # - name: Packages quota and quotatool absent 
-    #   include_tasks: absent.yml
-    #   when: ( quota is not defined ) or ( not quota )
+        - name: Include journaled tasks for Debian Bullseye and greater when aquota is not is use
+          ansible.builtin.include_tasks: journaled.yml
+          when:
+            - ( ansible_distribution_major_version is version('11', '>=') )
+            - ( quota_type is not defined ) or ( quota_type == "journaled" )
+
+        - name: Include aquota tasks for Debian Buster and Stretch or when aquota is in use
+          ansible.builtin.include_tasks: aquota.yml
+          when: ( ansible_distribution_major_version is version('11', '<') ) or ( (  quota_type is defined ) and ( quota_type == "aquota" ) )
+
+      when: ( quota is defined ) and ( quota )
 
   tags:
     - quota

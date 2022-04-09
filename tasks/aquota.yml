@@ -2,24 +2,15 @@
 - name: Enable and configue quotas
   block:
 
-    - name: Quota and quotatool present
-      apt:
-        pkg:
-          - quota
-          - quotatool
-        state: present
-        update_cache: true
-      notify: Restart quota
-
     - name: "{{ quota_device }}:{{ quota_dir_name }} present in /etc/quotatab"
-      lineinfile:
+      ansible.builtin.lineinfile:
         dest: /etc/quotatab
         line: "{{ quota_device }}:{{ quota_dir_name }}"
         state: present
       notify: Restart quota
 
     - name: "Touch {{ quota_dir }}/aquota.user"
-      file:
+      ansible.builtin.file:
         path: "{{ quota_dir }}/aquota.user"
         state: touch
         access_time: preserve
@@ -30,38 +21,38 @@
       notify: Restart quota
 
     - name: Quota enabled and running
-      service:
+      ansible.builtin.service:
         name: quota
         state: started
 
     - name: "Run quotaon {{ quota_dir }}"
-      command: "quotaon {{ quota_dir }}"
+      ansible.builtin.command: "quotaon {{ quota_dir }}"
       register: quota_quotaon
       when: not quota_enabled
       failed_when: ( "Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout )
 
     - name: "Read the grace times for {{ quota_dir }}"
-      shell: "repquota {{ quota_dir | default('/home') }} | grep '^Block'"
+      ansible.builtin.shell: "repquota {{ quota_dir | default('/home') }} | grep '^Block'"
       register: quota_grace_times_before
       changed_when: false
 
     - name: "Set the gracetimes for {{ quota_dir | default('/home') }}"
-      shell: "setquota -t {{ quota_grace_block | default('86400') }} {{ quota_grace_inode | default('86400') }} {{ quota_dir | default('/home') }} ; repquota {{ quota_dir | default('/home') }} | grep '^Block'"
+      ansible.builtin.shell: "setquota -t {{ quota_grace_block | default('86400') }} {{ quota_grace_inode | default('86400') }} {{ quota_dir | default('/home') }} ; repquota {{ quota_dir | default('/home') }} | grep '^Block'"
       register: quota_grace_times_after
       changed_when: quota_grace_times_before.stdout != quota_grace_times_after.stdout
 
     - name: Quota warning config in place
-      template:
+      ansible.builtin.template:
         src: warnquota.conf.j2
         dest: /etc/warnquota.conf
 
     - name: Quota warning defaults in place
-      template:
+      ansible.builtin.template:
         src: quota.j2
         dest: /etc/default/quota
 
     - name: Warn that a reboot might be needed
-      debug:
+      ansible.builtin.debug:
         msg: "You might need to reboot this server before the disk quotas are applied"
       when: quota_installed.changed
 
