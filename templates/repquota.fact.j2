@@ -2,6 +2,6 @@
 
 # {{ ansible_managed }}
 
-set -e -o pipefail
+set -euo pipefail
 
 repquota "{{ quota_dir }}" -O csv | jc -m --csv
