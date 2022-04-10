@@ -4,4 +4,10 @@
 
 set -euo pipefail
 
-repquota "{{ quota_dir }}" -O csv | jc -m --csv
+REPQUOTA="{{ quota_repquota }}"
+
+if [[ -f "${REPQUOTA}" ]]; then
+
+  repquota "{{ quota_dir }}" -O csv | jc -m --csv 
+
+fi

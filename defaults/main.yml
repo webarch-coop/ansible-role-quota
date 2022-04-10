@@ -12,4 +12,5 @@ quota_warn_message:
 quota_warn_signature:
 # quota_grace_block:
 # quota_grace_inode:
+quota_repquota: /usr/sbin/repquota
 ...
