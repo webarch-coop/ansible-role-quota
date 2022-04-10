@@ -2,11 +2,10 @@
 - name: Requirements
   block:
 
-    # Packages and directories are not removed when not quota in case other things depend on them
-    - name: Packages directories and files present when quota
+    - name: Packages, directories and files present when quota
       block:
 
-        - name: Required packages present
+        - name: Packages present
           apt:
             pkg:
               - jc
@@ -32,15 +31,37 @@
             mode: 0700
             owner: root
             group: root
+          register: quota_repquota_facts
+
+        - name: Re-read Ansible local facts
+          ansible.builtin.setup:
+            filter: ansible_local
+          when: quota_repquota_facts.changed
 
       when: quota
 
-    - name: Ansible local facts repquota script absent when not quota
-      file:
-        path: /etc/ansible/facts.d/repquota.fact
-        state: absent
-      when: not quota
+    - name: Packages, directories and files absent when not quota
+      block:
 
+        - name: Ansible local facts repquota script absent when not quota
+          file:
+            path: /etc/ansible/facts.d/repquota.fact
+            state: absent
+
+        - name: Packages absent
+          apt:
+            pkg:
+              - quota
+              - quotatool
+            state: absent
+            autoclean: true
+            autoremove: true
+
+        - name: Re-read Ansible facts
+          ansible.builtin.setup:
+
+      when: not quota
+        
   tags:
     - quota
 ...
