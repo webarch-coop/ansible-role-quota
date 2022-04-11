@@ -34,7 +34,7 @@
 
     - name: Set empty variables for the quota type, device, device options and device features
       ansible.builtin.set_fact:
-        quota_grace_array: "ansible_facts[ansible_local][quotatool_{{ quota_name }}]"
+        quota_grace_array: "ansible_facts['ansible_local']['quotatool_{{ quota_name }}']"
 
     - name: "Debug grace quota array for {{ quota_dir }}"
       debug:
