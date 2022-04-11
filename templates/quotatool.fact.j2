@@ -6,7 +6,7 @@ set -euo pipefail
 
 QUOTATOOL="{{ quota_quotatool }}"
 
-if [[ -f "${REPQUOTA}" ]]; then
+if [[ -f "${QUOTATOOL}" ]]; then
 
   BLOCK_GRACE=$("${QUOTATOOL}" -v -n -u -b -t "{{ quota_grace_block }}" {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
   INODE_GRACE=$("${QUOTATOOL}" -v -n -u -i -t "{{ quota_grace_inode }}" {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
