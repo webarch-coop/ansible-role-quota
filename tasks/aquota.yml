@@ -38,8 +38,10 @@
 
     - name: "Set facts for the grace times for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ (line.split(' ')[3] | regex_replace(';$') | to_datetime('%H:%M')).seconds }}"
-        quota_existing_grace_inode: "{{ (line.split(' ')[7] | regex_replace(';$') | to_datetime('%H:%M')).seconds }}"
+        # quota_existing_grace_block: "{{ (line.split(' ')[3] | regex_replace(';$') | to_datetime('%H:%M')).seconds }}"
+        # quota_existing_grace_inode: "{{ (line.split(' ')[7] | regex_replace(';$') | to_datetime('%H:%M')).seconds }}"
+        quota_existing_grace_block: "{{ (line.split(' ')[3] | regex_replace(';$')) }}"
+        quota_existing_grace_inode: "{{ (line.split(' ')[7] | regex_replace(';$')) }}"
       when: line is regex('^Block grace time')
       loop: "{{ quota_repquota.stdout_lines }}"
       loop_control:
