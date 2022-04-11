@@ -61,7 +61,7 @@
           ansible.builtin.setup:
 
       when: not quota
-        
+
   tags:
     - quota
 ...

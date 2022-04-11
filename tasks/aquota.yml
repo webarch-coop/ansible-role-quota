@@ -1,11 +1,11 @@
 ---
-- name: Enable and configue quotas
+- name: Enable and configue quotas using aquota
   block:
 
-    - name: "{{ quota_device }}:{{ quota_dir_name }} present in /etc/quotatab"
+    - name: "{{ quota_device }}:{{ quota_name }} present in /etc/quotatab"
       ansible.builtin.lineinfile:
         dest: /etc/quotatab
-        line: "{{ quota_device }}:{{ quota_dir_name }}"
+        line: "{{ quota_device }}:{{ quota_name }}"
         state: present
       notify: Restart quota
 
