@@ -8,6 +8,11 @@ REPQUOTA="{{ quota_quotatool }}"
 
 if [[ -f "${REPQUOTA}" ]]; then
 
-else
+  BLOCK_GRACE=$(quotatool -v -n -u -b -t "{{ quota_grace_block }}" {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
+  INODE_GRACE=$(quotatool -v -n -u -i -t "{{ quota_grace_inode }}" {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
 
+  jo state=present block_grace=${BLOCK_GRACE} inode_grace=${INODE_GRACE}
+
+else
+  jo state=absent
 fi
