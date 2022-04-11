@@ -40,10 +40,10 @@
       ansible.builtin.set_fact:
         quota_existing_grace_block: "{{ (line.split(' ')[3] | regex_replace(';$') | to_datetime('%H:%M'))).seconds }}"
         quota_existing_grace_inode: "{{ (line.split(' ')[7] | regex_replace(';$') | to_datetime('%H:%M'))).seconds }}"
-      when: line is regex('^Block grace time') 
+      when: line is regex('^Block grace time')
       loop: "{{ quota_repquota.stdout_lines }}"
       loop_control:
-        loop_var: line 
+        loop_var: line
         extended: true
         label: "line {{ ansible_loop.index }}"
 
