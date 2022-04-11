@@ -34,7 +34,7 @@
 
     - name: Set empty variables for the quota type, device, device options and device features
       ansible.builtin.set_fact:
-        quota_grace_array: "{{ ansible_facts['ansible_local']['quotatool_' ~ quota_name] }}"
+        quota_grace_array: "{{ hostvars[inventory_hostname][ansible_facts['ansible_local']['quotatool_' ~ quota_name] }}"
 
     - name: Set empty variables for the quota type, device, device options and device features
       ansible.builtin.set_fact:
@@ -44,6 +44,8 @@
       debug:
         var: quota_grace_array
         verbosity: 2
+
+    - fail:
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
