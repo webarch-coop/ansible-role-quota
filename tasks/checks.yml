@@ -37,7 +37,7 @@
         quota_grace_array: "{{ ansible_facts['ansible_local']['quotatool_' ~ quota_name] }}"
 
     - name: "Debug grace quota array for {{ quota_dir }}"
-      debug:
+      ansible.builtin.debug:
         var: quota_grace_array
         verbosity: 2
 
@@ -48,22 +48,22 @@
       when: quota_grace_array.state == "present"
 
     - name: "Existing block grace time in seconds for {{ quota_dir }}"
-      debug:
+      ansible.builtin.debug:
         var: quota_existing_grace_block
         verbosity: 2
       when: quota_existing_grace_block is defined
 
     - name: "Existing inode grace time in seconds for {{ quota_dir }}"
-      debug:
+      ansible.builtin.debug:
         var: quota_existing_grace_inode
         verbosity: 2
       when: quota_existing_grace_inode is defined
 
-    - name: Ensure that block and inode grace times are intergers when defined
-      assert:
+    - name: Ensure that block and inode grace times consist of numbers when defined
+      ansible.builtin.assert:
         that:
-          - quota_existing_grace_block is regex('[0-9]{1,99999999}')
-          - quota_existing_grace_inode is regex('[0-9]{1,99999999}')
+          - quota_existing_grace_block is regex('[0-9]{1,9999999999}')
+          - quota_existing_grace_inode is regex('[0-9]{1,9999999999}')
       when: ( quota_existing_grace_block is defined ) and ( quota_existing_grace_inode is defined )
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"

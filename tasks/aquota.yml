@@ -31,7 +31,7 @@
       when: not quota_enabled
       failed_when: ( "Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout )
 
-    - name: "Set the gracetimes for {{ quota_dir | default('/home') }}"
+    - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
       when: ( (quota_existing_grace_block | int) != (quota_grace_block | int) ) or ( (quota_existing_grace_inode | int) != (quota_grace_inode | int) )
 
@@ -39,16 +39,22 @@
       ansible.builtin.template:
         src: warnquota.conf.j2
         dest: /etc/warnquota.conf
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Quota warning defaults in place
       ansible.builtin.template:
         src: quota.j2
         dest: /etc/default/quota
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Warn that a reboot might be needed
       ansible.builtin.debug:
         msg: "You might need to reboot this server before the disk quotas are applied"
-      when: quota_installed.changed
+      when: not quota_enabled
 
   tags:
     - quota
