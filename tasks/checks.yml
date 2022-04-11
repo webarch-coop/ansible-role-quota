@@ -31,6 +31,7 @@
         quota_device: ""
         quota_device_options: []
         quota_device_features: []
+        quota_grace_array: "ansible_facts.ansible_local.quotatool_{{ quota_name }}"
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
@@ -141,37 +142,42 @@
         that:
           - ( quota_enabled is defined ) and ( quota_enabled | type_debug == "bool" )
 
-    - name: "Check the current value for the block grace time for {{ quota_dir }}"
-      ansible.builtin.command: "quotatool -v -n -u -b -t {{ quota_grace_block | quote }} {{ quota_dir }}"
-      check_mode: false
-      changed_when: false
-      register: quota_quotatool_block
+#    - name: "Check the current value for the block grace time for {{ quota_dir }}"
+#      ansible.builtin.command: "quotatool -v -n -u -b -t {{ quota_grace_block | quote }} {{ quota_dir }}"
+#      check_mode: false
+#      changed_when: false
+#      register: quota_quotatool_block
+#
+#    - name: "Set a variable for the existing block grace time in seconds for {{ quota_dir }}"
+#      ansible.builtin.set_fact:
+#        quota_existing_grace_block: "{{ line.split('\t')[1] }}"
+#      when: ansible_loop.last
+#      loop: "{{ quota_quotatool_block.stderr_lines }}"
+#      loop_control:
+#        loop_var: line
+#        extended: true
+#        label: "line {{ ansible_loop.index }}"
+#
+#    - name: "Check the current value for the inode grace time for {{ quota_dir }}"
+#      ansible.builtin.command: "quotatool -v -n -u -i -t {{ quota_grace_block | quote }} {{ quota_dir }}"
+#      check_mode: false
+#      changed_when: false
+#      register: quota_quotatool_inode
+#
+#    - name: "Set a variable for the existing inode grace time in seconds for {{ quota_dir }}"
+#      ansible.builtin.set_fact:
+#        quota_existing_grace_inode: "{{ line.split('\t')[1] }}"
+#      when: ansible_loop.last
+#      loop: "{{ quota_quotatool_inode.stderr_lines }}"
+#      loop_control:
+#        loop_var: line
+#        extended: true
+#        label: "line {{ ansible_loop.index }}"
 
-    - name: "Set a variable for the existing block grace time in seconds for {{ quota_dir }}"
+    - name: "Set variables for existing block and inode grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ line.split('\t')[1] }}"
-      when: ansible_loop.last
-      loop: "{{ quota_quotatool_block.stderr_lines }}"
-      loop_control:
-        loop_var: line
-        extended: true
-        label: "line {{ ansible_loop.index }}"
-
-    - name: "Check the current value for the inode grace time for {{ quota_dir }}"
-      ansible.builtin.command: "quotatool -v -n -u -i -t {{ quota_grace_block | quote }} {{ quota_dir }}"
-      check_mode: false
-      changed_when: false
-      register: quota_quotatool_inode
-
-    - name: "Set a variable for the existing inode grace time in seconds for {{ quota_dir }}"
-      ansible.builtin.set_fact:
-        quota_existing_grace_inode: "{{ line.split('\t')[1] }}"
-      when: ansible_loop.last
-      loop: "{{ quota_quotatool_inode.stderr_lines }}"
-      loop_control:
-        loop_var: line
-        extended: true
-        label: "line {{ ansible_loop.index }}"
+        quota_existing_grace_block: "{{ quota_grace_array.block_grace }}"
+        quota_existing_grace_inode: "{{ quota_grace_array.inode_grace }}"
 
     - name: "Existing block grace time in seconds for {{ quota_dir }}"
       debug:

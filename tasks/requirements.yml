@@ -52,9 +52,14 @@
     - name: Packages, directories and files absent when not quota
       block:
 
-        - name: Ansible local facts repquota script absent when not quota
+        - name: "Ansible local facts repquota script for {{ quota_name }} absent when not quota"
           file:
-            path: /etc/ansible/facts.d/repquota.fact
+            path: "/etc/ansible/facts.d/repquota_{{ quota_name }}.fact"
+            state: absent
+
+        - name: "Ansible local facts quotatool script for {{ quota_name }} absent when not quota"
+          file:
+            path: "/etc/ansible/facts.d/quotatool_{{ quota_name }}.fact"
             state: absent
 
         - name: Packages absent
