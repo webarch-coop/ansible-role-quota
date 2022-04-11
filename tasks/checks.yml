@@ -43,8 +43,8 @@
 
     - name: "Set variables for existing block and inode grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ quota_grace_array.block_grace }}"
-        quota_existing_grace_inode: "{{ quota_grace_array.inode_grace }}"
+        quota_existing_grace_block: "{{ quota_grace_array.block_grace | int }}"
+        quota_existing_grace_inode: "{{ quota_grace_array.inode_grace | int }}"
       when: quota_grace_array.state == "present"
 
     - name: "Existing block grace time in seconds for {{ quota_dir }}"
