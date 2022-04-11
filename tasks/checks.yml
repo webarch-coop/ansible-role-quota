@@ -13,7 +13,7 @@
         that:
           - ( quota is defined ) and ( quota | type_debug == "bool" )
           - ( quota_dir is defined ) and ( quota_dir is regex('^\/[a-zA-Z0-9\/]{1,99}$') )
-          - ( quota_name is defined )
+          - ( quota_name is defined ) and ( quota_name is regex('[a-zA-Z0-9_-]{1,99}$') )
           - ( quota_warn is defined ) and ( quota_warn | type_debug == "bool" )
 
     - name: Ensure that quota warn variables are set
@@ -149,7 +149,7 @@
 
     - name: "Set a variable for the existing block grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ line.split(' ')[3] }}"
+        quota_existing_grace_block: "{{ line.split(' ')[2] }}"
       when: ansible_loop.last
       loop: "{{ quota_quotatool_block.stderr_lines }}"
       loop_control:
@@ -165,7 +165,7 @@
 
     - name: "Set a variable for the existing inode grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_existing_grace_inode: "{{ line.split(' ')[3] }}"
+        quota_existing_grace_inode: "{{ line.split(' ')[2] }}"
       when: ansible_loop.last
       loop: "{{ quota_quotatool_inode.stderr_lines }}"
       loop_control:

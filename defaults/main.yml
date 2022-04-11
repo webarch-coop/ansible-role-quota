@@ -5,6 +5,7 @@ quota_name: "{{ quota_dir | regex_replace('^\/') }}"
 quota_grace_block: 86400
 quota_grace_inode: 86400
 quota_repquota: /usr/sbin/repquota
+quota_quotatool: /usr/sbin/quotatool
 quota_warn: true
 quota_warn_from: root@localhost
 quota_warn_subject: Over quota
