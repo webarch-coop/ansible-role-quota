@@ -62,8 +62,8 @@
     - name: Ensure that block and inode grace times consist of numbers when defined
       ansible.builtin.assert:
         that:
-          - quota_existing_grace_block is regex('[0-9]{1,9999999999}')
-          - quota_existing_grace_inode is regex('[0-9]{1,9999999999}')
+          - quota_existing_grace_block is regex('^[0-9]+$')
+          - quota_existing_grace_inode is regex('^[0-9]+$')
       when: ( quota_existing_grace_block is defined ) and ( quota_existing_grace_inode is defined )
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
