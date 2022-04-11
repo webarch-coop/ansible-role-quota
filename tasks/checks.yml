@@ -149,7 +149,7 @@
 
     - name: "Set a variable for the existing block grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ line.split(' ')[2] }}"
+        quota_existing_grace_block: "{{ line.split('\t')[1] }}"
       when: ansible_loop.last
       loop: "{{ quota_quotatool_block.stderr_lines }}"
       loop_control:
@@ -165,7 +165,7 @@
 
     - name: "Set a variable for the existing inode grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_existing_grace_inode: "{{ line.split(' ')[2] }}"
+        quota_existing_grace_inode: "{{ line.split('\t')[1] }}"
       when: ansible_loop.last
       loop: "{{ quota_quotatool_inode.stderr_lines }}"
       loop_control:

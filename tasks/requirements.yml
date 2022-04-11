@@ -24,7 +24,7 @@
             owner: root
             group: root
 
-        - name: Ansible local facts repquota script present
+        - name: "Ansible local facts repquota script present for {{ quota_name }}"
           ansible.builtin.template:
             src: repquota.fact.j2
             dest: "/etc/ansible/facts.d/repquota_{{ quota_name }}.fact"
@@ -33,10 +33,19 @@
             group: root
           register: quota_repquota_facts
 
+        - name: "Ansible local facts quotatool script present for {{ quota_name }}"
+          ansible.builtin.template:
+            src: quotatool.fact.j2
+            dest: "/etc/ansible/facts.d/quotatool_{{ quota_name }}.fact"
+            mode: 0700
+            owner: root
+            group: root
+          register: quota_quotatool_facts
+
         - name: Re-read Ansible local facts
           ansible.builtin.setup:
             filter: ansible_local
-          when: quota_repquota_facts.changed
+          when: ( quota_repquota_facts.changed ) or ( quota_quotatool_facts.changed )
 
       when: quota
 
