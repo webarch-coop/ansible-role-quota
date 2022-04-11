@@ -31,7 +31,12 @@
         quota_device: ""
         quota_device_options: []
         quota_device_features: []
-        quota_grace_array: "{'ansible_facts.ansible_local.quotatool_{{ quota_name }}'}"
+        quota_grace_array: "ansible_facts[ansible_local][quotatool_{{ quota_name }}]"
+
+    - name: "Debug grace quota array for {{ quota_dir }}"
+      debug:
+        var: quota_grace_array
+        verbosity: 2
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
@@ -173,11 +178,6 @@
 #        loop_var: line
 #        extended: true
 #        label: "line {{ ansible_loop.index }}"
-
-    - name: "Debug grace quota array for {{ quota_dir }}"
-      debug:
-        var: quota_grace_array
-        verbosity: 2
 
     - name: "Set variables for existing block and inode grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
