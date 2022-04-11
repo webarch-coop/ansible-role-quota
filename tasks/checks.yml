@@ -173,6 +173,16 @@
         extended: true
         label: "line {{ ansible_loop.index }}"
 
+    - name: "Existing block grace time in seconds for {{ quota_dir }}"
+      debug:
+        var: quota_existing_grace_block
+        verbosity: 2
+
+    - name: "Existing inode grace time in seconds for {{ quota_dir }}"
+      debug:
+        var: quota_existing_grace_inode
+        verbosity: 2
+
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
         msg:
