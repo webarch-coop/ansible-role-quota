@@ -110,7 +110,7 @@
       loop_control:
         loop_var: line
 
-    - name: "Debug {{ quota_device }} mount options array"
+    - name: "Debug {{ quota_device }} mount features array"
       ansible.builtin.debug:
         var: quota_device_features
         verbosity: 2
