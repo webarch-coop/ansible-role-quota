@@ -62,8 +62,8 @@
     - name: Ensure that block and inode grace times are intergers when defined
       assert:
         that:
-          - quota_existing_grace_block | type_debug == "int"
-          - quota_existing_grace_inode | type_debug == "int"
+          - quota_existing_grace_block is regex('[0-9]{1,99999999}')
+          - quota_existing_grace_inode is regex('[0-9]{1,99999999}')
       when: ( quota_existing_grace_block is defined ) and ( quota_existing_grace_inode is defined )
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
