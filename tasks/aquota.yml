@@ -51,8 +51,8 @@
 
     - name: "Convert the grace times for {{ quota_dir }} into seconds"
       ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ quota_existing_grace_block_raw | to_datetime('%H:%M') }}"
-        quota_existing_grace_inode: "{{ quota_existing_grace_inode_raw | to_datetime('%H:%M') }}"
+        quota_existing_grace_block: "{{ (quota_existing_grace_block_raw.line.split(':')[0] | int * 3600) + (quota_existing_grace_block_raw.line.split(':')[1] | int * 60) }}"
+        quota_existing_grace_inode: "{{ (quota_existing_grace_inode_raw.line.split(':')[0] | int * 3600) + (quota_existing_grace_inode_raw.line.split(':')[1] | int * 60) }}"
 
     - name: "Existing block grace time in seconds for {{ quota_dir }}"
       debug:
