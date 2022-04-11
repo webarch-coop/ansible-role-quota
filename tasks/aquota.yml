@@ -38,8 +38,6 @@
 
     - name: "Set facts for the grace times for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        # quota_existing_grace_block: "{{ (line.split(' ')[3] | regex_replace(';$') | to_datetime('%H:%M')).seconds }}"
-        # quota_existing_grace_inode: "{{ (line.split(' ')[7] | regex_replace(';$') | to_datetime('%H:%M')).seconds }}"
         quota_existing_grace_block_raw: "{{ line.split(' ')[3] | regex_replace(';$') }}"
         quota_existing_grace_inode_raw: "{{ line.split(' ')[7] | regex_replace(';$') }}"
       when: line is regex('^Block grace time')
@@ -64,9 +62,20 @@
         var: quota_existing_grace_inode
         verbosity: 2
 
+    - name: "Proposed block grace time in seconds for {{ quota_dir }}"
+      debug:
+        var: quota_grace_block
+        verbosity: 2
+
+    - name: "Proposed inode grace time in seconds for {{ quota_dir }}"
+      debug:
+        var: quota_grace_inode
+        verbosity: 2
+
+
     - name: "Set the gracetimes for {{ quota_dir | default('/home') }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
-      when: ( quota_existing_grace_block != quota_grace_block ) or ( quota_existing_grace_inode != quota_grace_inode )
+      when: ( (quota_existing_grace_block | int) != (quota_grace_block | int) ) or ( (quota_existing_grace_inode | int) != (quota_grace_inode | int) )
 
     - name: Quota warning config in place
       ansible.builtin.template:
