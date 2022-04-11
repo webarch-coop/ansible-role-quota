@@ -31,7 +31,7 @@
         quota_device: ""
         quota_device_options: []
         quota_device_features: []
-        quota_grace_array: "ansible_facts.ansible_local.quotatool_{{ quota_name }}"
+        quota_grace_array: "{'ansible_facts.ansible_local.quotatool_{{ quota_name }}'}"
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
