@@ -32,19 +32,7 @@
         quota_device_options: []
         quota_device_features: []
 
-#    - name: Set empty variables for the quota type, device, device options and device features
-#      ansible.builtin.set_fact:
-#        # quota_grace_array: "{{ ['ansible_facts']['ansible_local']['quotatool_' ~ quota_name] }}"
-#        # quota_grace_array: "{{ ['quotatool_' ~ quota_name] }}"
-#        quota_grace_array_name: "{{ 'quotatool_' ~ quota_name }}"
-#
-#    - name: Set empty variables for the quota type, device, device options and device features
-#      ansible.builtin.set_fact:
-#        # quota_grace_array: "{{ ['ansible_facts']['ansible_local']['quotatool_' ~ quota_name] }}"
-#        # quota_grace_array: "{{ ['quotatool_' ~ quota_name] }}"
-#        quota_grace_array: "{{ quota_grace_array_name }}"
-
-    - name: set var
+    - name: "Set a variable for the grace array for {{ quota_dir }}"
       ansible.builtin.set_fact:
         quota_grace_array: "{{ ansible_facts['ansible_local']['quotatool_' ~ quota_name] }}"
 
@@ -52,8 +40,6 @@
       debug:
         var: quota_grace_array
         verbosity: 2
-
-    - fail:
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
@@ -200,6 +186,7 @@
       ansible.builtin.set_fact:
         quota_existing_grace_block: "{{ quota_grace_array.block_grace }}"
         quota_existing_grace_inode: "{{ quota_grace_array.inode_grace }}"
+      when: quota_grace_array.state == "present"
 
     - name: "Existing block grace time in seconds for {{ quota_dir }}"
       debug:
