@@ -141,6 +141,38 @@
         that:
           - ( quota_enabled is defined ) and ( quota_enabled | type_debug == "bool" )
 
+    - name: "Check the current value for the block grace time for {{ quota_dir }}"
+      ansible.builtin.command: "quotatool -v -n -u -b -t {{ quota_grace_block | quote }} {{ quota_dir }}"
+      check_mode: false
+      changed_when: false
+      register: quota_quotatool_block
+
+    - name: "Set a variable for the existing block grace time in seconds for {{ quota_dir }}"
+      ansible.builtin.set_fact:
+        quota_existing_grace_block: "{{ line.split(' ')[3] }}"
+      when: line is ansible_loop.last
+      loop: "{{ quota_quotatool_block.stderr_lines }}"
+      loop_control:
+        loop_var: line
+        extended: true
+        label: "line {{ ansible_loop.index }}"
+
+    - name: "Check the current value for the inode grace time for {{ quota_dir }}"
+      ansible.builtin.command: "quotatool -v -n -u -i -t {{ quota_grace_block | quote }} {{ quota_dir }}"
+      check_mode: false
+      changed_when: false
+      register: quota_quotatool_inode
+
+    - name: "Set a variable for the existing inode grace time in seconds for {{ quota_dir }}"
+      ansible.builtin.set_fact:
+        quota_existing_grace_inode: "{{ line.split(' ')[3] }}"
+      when: line is ansible_loop.last
+      loop: "{{ quota_quotatool_inode.stderr_lines }}"
+      loop_control:
+        loop_var: line
+        extended: true
+        label: "line {{ ansible_loop.index }}"
+
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
         msg:

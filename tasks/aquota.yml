@@ -31,48 +31,6 @@
       when: not quota_enabled
       failed_when: ( "Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout )
 
-    - name: "Read the grace times for {{ quota_dir }}"
-      ansible.builtin.command: "repquota {{ quota_dir }}"
-      register: quota_repquota
-      changed_when: false
-
-    - name: "Set facts for the grace times for {{ quota_dir }}"
-      ansible.builtin.set_fact:
-        quota_existing_grace_block_raw: "{{ line.split(' ')[3] | regex_replace(';$') }}"
-        quota_existing_grace_inode_raw: "{{ line.split(' ')[7] | regex_replace(';$') }}"
-      when: line is regex('^Block grace time')
-      loop: "{{ quota_repquota.stdout_lines }}"
-      loop_control:
-        loop_var: line
-        extended: true
-        label: "line {{ ansible_loop.index }}"
-
-    - name: "Convert the grace times for {{ quota_dir }} into seconds"
-      ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ (quota_existing_grace_block_raw.split(':')[0] | int * 3600) + (quota_existing_grace_block_raw.split(':')[1] | int * 60) }}"
-        quota_existing_grace_inode: "{{ (quota_existing_grace_inode_raw.split(':')[0] | int * 3600) + (quota_existing_grace_inode_raw.split(':')[1] | int * 60) }}"
-
-    - name: "Existing block grace time in seconds for {{ quota_dir }}"
-      debug:
-        var: quota_existing_grace_block
-        verbosity: 2
-
-    - name: "Existing inode grace time in seconds for {{ quota_dir }}"
-      debug:
-        var: quota_existing_grace_inode
-        verbosity: 2
-
-    - name: "Proposed block grace time in seconds for {{ quota_dir }}"
-      debug:
-        var: quota_grace_block
-        verbosity: 2
-
-    - name: "Proposed inode grace time in seconds for {{ quota_dir }}"
-      debug:
-        var: quota_grace_inode
-        verbosity: 2
-
-
     - name: "Set the gracetimes for {{ quota_dir | default('/home') }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
       when: ( (quota_existing_grace_block | int) != (quota_grace_block | int) ) or ( (quota_existing_grace_inode | int) != (quota_grace_inode | int) )
