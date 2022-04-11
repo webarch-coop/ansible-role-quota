@@ -198,6 +198,8 @@
         var: quota_existing_grace_inode
         verbosity: 2
 
+    - fail:
+
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
         msg:
