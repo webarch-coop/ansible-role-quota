@@ -39,15 +39,11 @@
     - name: "Set a variable for the grace array for {{ quota_dir }}"
       ansible.builtin.set_fact:
         quota_grace_array: "{{ ansible_local['quotatool_' ~ quota_name] }}"
-        # quota_grace_array: "{{ ['ansible_local']['quotatool_' ~ quota_name] }}"
 
     - name: "Debug grace quota array for {{ quota_dir }}"
       ansible.builtin.debug:
         var: quota_grace_array
         verbosity: 2
-
-    - name: Debug fail
-      fail:
 
     - name: "Set variables for existing block and inode grace time in seconds for {{ quota_dir }}"
       ansible.builtin.set_fact:
