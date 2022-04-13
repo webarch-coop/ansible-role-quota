@@ -10,6 +10,7 @@ galaxy_info:
   platforms:
     - name: debian
       versions:
+        - bookworm
         - bullseye
         - buster
         - stretch

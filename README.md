@@ -6,9 +6,4 @@ The `quota_dir` has to be a partition and this role will fail if it isn't, it de
 
 See the [defaults/main.yml](defaults/main.yml) file for the default settings.
 
-You can users quotas by using the [users role](https://git.coop/webarch/users):
-
-```yml
-  vars:
-    users_quota: 1G
-```
+You set users quotas by using the [users role](https://git.coop/webarch/users), the tasks for this in that role should be moved to this role in the future.
