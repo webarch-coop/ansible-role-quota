@@ -6,8 +6,8 @@ set -euo pipefail
 
 REPQUOTA="{{ quota_repquota }}"
 
-if [[ -f "${REPQUOTA}" ]]; then
-
-  repquota "{{ quota_dir }}" -O csv | jc -m --csv 
-
+if [[ -f "{{ quota_dir }}/aquota.user" ]]; then
+  if [[ -f "${REPQUOTA}" ]]; then
+    repquota "{{ quota_dir }}" -O csv | jc -m --csv 
+  fi
 fi

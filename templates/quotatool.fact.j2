@@ -6,13 +6,17 @@ set -euo pipefail
 
 QUOTATOOL="{{ quota_quotatool }}"
 
-if [[ -f "${QUOTATOOL}" ]]; then
-
-  BLOCK_GRACE=$("${QUOTATOOL}" -v -n -u -b -t 86400 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
-  INODE_GRACE=$("${QUOTATOOL}" -v -n -u -i -t 86400 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
-
-  jo state=present block_grace="${BLOCK_GRACE}" inode_grace="${INODE_GRACE}"
-
+if quota -f {{ quota_dir | quote }}; then
+  if [[ -f "${QUOTATOOL}" ]]; then
+  
+    BLOCK_GRACE=$("${QUOTATOOL}" -v -n -u -b -t 86400 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
+    INODE_GRACE=$("${QUOTATOOL}" -v -n -u -i -t 86400 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
+  
+    jo state=present block_grace="${BLOCK_GRACE}" inode_grace="${INODE_GRACE}"
+  
+  else
+    jo state=absent
+  fi
 else
   jo state=absent
 fi
