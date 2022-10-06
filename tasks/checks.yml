@@ -11,18 +11,18 @@
     - name: Ensure that required variables are set
       ansible.builtin.assert:
         that:
-          - ( quota is defined ) and ( quota | type_debug == "bool" )
-          - ( quota_dir is defined ) and ( quota_dir is regex('^\/[a-zA-Z0-9\/]{1,99}$') )
-          - ( quota_name is defined ) and ( quota_name is regex('[a-zA-Z0-9_-]{1,99}$') )
-          - ( quota_warn is defined ) and ( quota_warn | type_debug == "bool" )
+          - (quota is defined) and (quota | type_debug == "bool")
+          - (quota_dir is defined) and (quota_dir is regex('^\/[a-zA-Z0-9\/]{1,99}$'))
+          - (quota_name is defined) and (quota_name is regex('[a-zA-Z0-9_-]{1,99}$'))
+          - (quota_warn is defined) and (quota_warn | type_debug == "bool")
 
     - name: Ensure that quota warn variables are set
       ansible.builtin.assert:
         that:
-          - ( quota_warn_from is defined )
-          - ( quota_warn_subject is defined )
-          - ( quota_warn_cc is defined )
-          - ( quota_warn_support is defined )
+          - (quota_warn_from is defined)
+          - (quota_warn_subject is defined)
+          - (quota_warn_cc is defined)
+          - (quota_warn_support is defined)
       when: quota_warn is defined
 
     - name: Set empty variables for the quota type, device, device options and device features
@@ -33,8 +33,9 @@
         quota_device_features: []
 
     - name: Debug ansible_local
-      debug:
+      ansible.builtin.debug:
         var: ansible_local
+        verbosity: 2
 
     - name: "Set a variable for the grace array for {{ quota_dir }}"
       ansible.builtin.set_fact:
@@ -68,7 +69,7 @@
         that:
           - quota_existing_grace_block is regex('^[0-9]+$')
           - quota_existing_grace_inode is regex('^[0-9]+$')
-      when: ( quota_existing_grace_block is defined ) and ( quota_existing_grace_inode is defined )
+      when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
 
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
@@ -143,8 +144,8 @@
       ansible.builtin.set_fact:
         quota_type: "{% if quota_type_aquota %}aquota{% elif quota_type_journald %}journald{% endif %}"
       when: >
-         ( ( quota_type_aquota is defined ) and ( quota_type_aquota ) or
-         ( quota_type_journald is defined ) and ( quota_type_journald ) )
+         ((quota_type_aquota is defined) and (quota_type_aquota) or
+         (quota_type_journald is defined) and (quota_type_journald))
 
     - name: "Debug the quota_type when defined"
       ansible.builtin.debug:
@@ -171,13 +172,13 @@
     - name: "Ensure that quota_type is valid if defined for {{ quota_dir }}"
       ansible.builtin.assert:
         that:
-          - ( quota_type == "aquota" ) or ( quota_type == "journald" )
+          - (quota_type == "aquota") or (quota_type == "journald")
       when: quota_type is defined
 
     - name: "Ensure that quota_enabled is defined and a booolean for {{ quota_dir }}"
       ansible.builtin.assert:
         that:
-          - ( quota_enabled is defined ) and ( quota_enabled | type_debug == "bool" )
+          - (quota_enabled is defined) and (quota_enabled | type_debug == "bool")
 
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:

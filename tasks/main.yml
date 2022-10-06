@@ -1,5 +1,5 @@
 ---
-- name: quota tasks
+- name: Quota tasks
   block:
 
     - name: Include requirements
@@ -13,13 +13,13 @@
 
         - name: Include journaled tasks for Debian Bullseye and greater when aquota is not is use
           ansible.builtin.include_tasks: journaled.yml
-          when: ( ansible_distribution_major_version is version('11', '>=') ) and ( ( quota_type is not defined ) or ( quota_type == "journaled" ) )
+          when: (ansible_distribution_major_version is version('11', '>=')) and ((quota_type is not defined) or (quota_type == "journaled"))
 
         - name: Include aquota tasks for Debian Buster and Stretch or when aquota is in use
           ansible.builtin.include_tasks: aquota.yml
-          when: ( ansible_distribution_major_version is version('11', '<') ) or ( (  quota_type is defined ) and ( quota_type == "aquota" ) )
+          when: (ansible_distribution_major_version is version('11', '<')) or ((quota_type is defined) and (quota_type == "aquota"))
 
-      when: ( quota is defined ) and ( quota )
+      when: (quota is defined) and (quota)
 
   tags:
     - quota
