@@ -1,5 +1,5 @@
 ---
-- name: Quota restarted
+- name: Restart quota
   service:
     name: quota
     state: restarted
