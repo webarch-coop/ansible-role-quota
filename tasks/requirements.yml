@@ -16,7 +16,7 @@
         path: /etc/ansible/facts.d
         state: directory
         recurse: true
-        mode: 0700
+        mode: 0755
         owner: root
         group: root
 
@@ -41,7 +41,7 @@
     - name: Re-read Ansible local facts
       ansible.builtin.setup:
         filter: ansible_local
-      when: ( quota_repquota_facts.changed ) or ( quota_quotatool_facts.changed )
+      when: (quota_repquota_facts.changed) or (quota_quotatool_facts.changed)
 
   when: quota
   tags:
