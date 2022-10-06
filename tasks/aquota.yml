@@ -31,9 +31,17 @@
       when: not quota_enabled
       failed_when: ( "Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout )
 
+    - name: Debug quotaon results
+      ansible.builtin.debug:
+        var: quota_quotaon
+        verbosity: 2
+      when: quota_quotaon is defined
+
     - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
-      when: ( (quota_existing_grace_block | int) != (quota_grace_block | int) ) or ( (quota_existing_grace_inode | int) != (quota_grace_inode | int) )
+      when:
+        - quota_quotaon is defined
+        - ( (quota_existing_grace_block | int) != (quota_grace_block | int) ) or ( (quota_existing_grace_inode | int) != (quota_grace_inode | int) )
 
     - name: Quota warning config in place
       ansible.builtin.template:
