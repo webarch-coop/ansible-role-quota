@@ -107,10 +107,15 @@
         verbosity: 2
 
     - name: "Check the current values of the parameters that can be set by tune2fs for {{ quota_device }}"
-      ansible.builtin.shell: "tune2fs -l {{ quota_device }} | tail -n +2"
+      ansible.builtin.shell: "tune2fs -l {{ quota_device }} | tail -n +2 | jc --kv"
       check_mode: false
       changed_when: false
       register: quota_tune2fs
+
+    - name: Debug quota_tune2fs
+      ansible.builtin.debug:
+        var: quota_tune2fs
+        verbosity: 2
 
     - name: Set a fact for the device features
       ansible.builtin.set_fact: 
