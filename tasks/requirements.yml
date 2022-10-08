@@ -2,10 +2,11 @@
 - name: Packages, directories and files present when quota
   block:
 
+    # TODO add a check that jc is installed (it could be installed using pip rather than a deb)
+
     - name: Packages present
       ansible.builtin.apt:
         pkg:
-          - jc
           - jo
           - quota
           - quotatool
