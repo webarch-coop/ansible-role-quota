@@ -8,7 +8,8 @@ TUNE2FS="{{ quota_tune2fs }}"
 
 if [[ -f "${TUNE2FS}" ]]; then
 
-  FEATURES="tune2fs -l {{ quota_device | quote }} | grep '^Filesystem features:' | sed 's/Filesystem features:      //'"
+  # FEATURES="${TUNE2FS}  -l {{ quota_device | quote }} | grep '^Filesystem features:' | sed 's/Filesystem features:      //'"
+  FEATURES="${TUNE2FS} -l {{ quota_device | quote }} | jc --kv | jq '.[\"Filesystem features\"]'"
 
   jo state=present -a ${FEATURES}
 
