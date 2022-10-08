@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# {{ ansible_managed }}
+
+set -euo pipefail
+
+TUNE2FS="{{ quota_tune2fs }}"
+
+if [[ -f "${TUNE2FS}" ]]; then
+
+  FEATURES="tune2fs -l {{ quota_device | quote }} | grep '^Filesystem features:' | sed 's/Filesystem features:      //'"
+
+  jo state=present -a ${FEATURES}
+
+else
+  jo state=absent
+fi
