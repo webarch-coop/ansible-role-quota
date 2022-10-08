@@ -119,8 +119,10 @@
 
     - name: Set a fact for the device features
       ansible.builtin.set_fact: 
-        quota_device_features: "{{ quota_tune2fs.stdout | from_json }}"
-        # quota_device_features: "{{ quota_tune2fs | community.general.jc('kv') }}"
+        quota_device_features: "{{ quota_tune2fs.stdout | from_json | community.general.json_query(json_query) }}"
+      var:
+        json_query: '["Filesystem features"]'
+        # quota_device_features: "{{ quota_tune2fs | commiunity.general.jc('kv') }}"
         # quota_device_features: "{{ quota_tune2fs | community.general.jc('kv') | community.general.json_query('`Filesystem features`') }}"
 
     - name: "Debug {{ quota_device }} mount features array"
