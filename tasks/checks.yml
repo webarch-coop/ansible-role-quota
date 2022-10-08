@@ -71,6 +71,11 @@
           - quota_existing_grace_inode is regex('^[0-9]+$')
       when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
 
+    - name: Debug the mounts
+      ansible.builtin.debug:
+        var: ansible_facts.mounts
+        verbosity: 2
+
     - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
         quota_device: "{{ mnt.device }}"
