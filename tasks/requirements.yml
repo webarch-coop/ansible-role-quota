@@ -84,6 +84,11 @@
         path: "/etc/ansible/facts.d/quotatool_{{ quota_name }}.fact"
         state: absent
 
+    - name: "Ansible local facts tune2fs script for {{ quota_name }} absent when not quota"
+      ansible.builtin.file:
+        path: "/etc/ansible/facts.d/tune2fs_{{ quota_name }}.fact"
+        state: absent
+
     - name: Packages absent
       ansible.builtin.apt:
         pkg:
