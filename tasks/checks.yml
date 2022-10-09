@@ -135,12 +135,19 @@
 
     - name: Set a fact for the device features
       ansible.builtin.set_fact: 
-        quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query('[?key == `Filesystem features`].value | [0]') | split(' ') | list }}"
+        quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query(quota_device_features_query) | split(' ') | list }}"
+      vars:
+        quota_device_features_query: "[?key == 'Filesystem features'].value | [0]"
 
     - name: "Debug {{ quota_device }} mount features array"
       ansible.builtin.debug:
         var: quota_device_features
         verbosity: 2
+
+    - name: "Check if usrjquota=aquota.user is present for {{ quota_device }}"
+      ansible.builtin.set_fact:
+        quota_type_aquota: true
+      when: ("usrjquota=aquota.user" in quota_device_options)
 
     - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
       ansible.builtin.set_fact:
@@ -152,6 +159,11 @@
         loop_var: opt
         label: "option {{ ansible_loop.index }}"
 
+    - name: "Check if quota is present for {{ quota_device }}"
+      ansible.builtin.set_fact:
+        quota_type_journald: true
+      when: ("quota" in quota_device_features)
+
     - name: "Loop through the {{ quota_device }} features to check if quota is present"
       ansible.builtin.set_fact:
         quota_type_journald: true
@@ -161,6 +173,8 @@
         extended: true
         loop_var: feat
         label: "feature {{ ansible_loop.index }}"
+
+    - fail:
 
     - name: "Set a fact for the quota type for {{ quota_device }}"
       ansible.builtin.set_fact:
