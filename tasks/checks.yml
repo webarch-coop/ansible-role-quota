@@ -84,7 +84,7 @@
       ansible.builtin.set_fact:
         quota_device: "{{ quota_mounts | community.general.json_query(quota_query) }}"
       vars:
-        quota_query: "[?mount == '{{ quota_dir }}].device'"
+        quota_query: "[?mount == '{{ quota_dir }}'].device"
 # community.general.json_query('[?key == `Filesystem features`].value | [0]') | split(' ') | list }}"
     #   quota_device_options: "{{ (mnt.options).split(',') | list }}"
     #   when: mnt.mount == quota_dir
