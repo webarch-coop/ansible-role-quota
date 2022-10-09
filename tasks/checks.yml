@@ -177,12 +177,14 @@
       ansible.builtin.debug:
         msg:
           - "{{ quota_quotaon.stdout }} using {{ quota_type }}"
+        verbosity: 1
       when: quota_type is defined
 
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
         msg:
           - "{{ quota_quotaon.stdout }}"
+        verbosity: 1
       when: quota_type is not defined
 
   tags:
