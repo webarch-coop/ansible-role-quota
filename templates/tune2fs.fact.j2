@@ -5,14 +5,10 @@
 set -euo pipefail
 
 TUNE2FS="{{ quota_tune2fs }}"
+JC="{{ quota_jc }}"
 
-if [[ -f "${TUNE2FS}" ]]; then
-
-  # FEATURES="${TUNE2FS}  -l {{ quota_device | quote }} | grep '^Filesystem features:' | sed 's/Filesystem features:      //'"
-  FEATURES="${TUNE2FS} -l {{ quota_device | quote }} | jc --kv | jq '.[\"Filesystem features\"]'"
-
-  jo state=present -a ${FEATURES}
-
+if [[ -f "${TUNE2FS}" && -f "${JC}" ]]; then
+  ${TUNE2FS} -l /dev/xvda4 | tail -n +2 | ${JC} --kv
 else
   jo state=absent
 fi
