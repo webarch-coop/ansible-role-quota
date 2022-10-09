@@ -1,0 +1,72 @@
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: Ansible role to install and configure quotas on Debian.
+    short_description: The main entry point for the quota role.
+    options:
+      quota:
+        type: bool
+        required: true
+        description: Run the tasks in this role
+      quota_dir:
+        type: str
+        required: true
+        description: The directory that quotas are set below.
+      quota_name:
+        type: str
+        required: true
+        description: The name for the quota directory.
+      quota_grace_block:
+        type: int
+        required: true
+        description: The quota grace time for blocks.
+      quota_grace_inode:
+        type: int
+        required: true
+        description: The quota grace time for inodes.
+      quota_repquota:
+        type: str
+        required: true
+        description: The path to repquota.
+      quota_quotatool:
+        type: str
+        required: true
+        description: The path to quotatool.
+      quota_tune2fs:
+        type: str
+        required: true
+        description: The path to tune2fs.
+      quota_warn:
+        type: bool
+        required: true
+        description: Warn when quota are reached.
+      quota_warn_from:
+        type: str
+        required: false
+        description: From address for the quota warning emails.
+      quota_warn_subject:
+        type: str
+        required: false
+        description: Subject line for the quota warning emails.
+      quota_warn_cc:
+        type: str
+        required: false
+        description: CC address for the quota warning emails.
+      quota_warn_support:
+        type: str
+        required: false
+        description: Support email address for the quota warning emails.
+      quota_warn_phone:
+        type: str
+        required: false
+        description: Phone number for the quota warning emails.
+      quota_warn_message:
+        type: str
+        required: false
+        description: Message for the quota warning emails.
+      quota_warn_signature:
+        type: str
+        required: false
+        description: Signature for the quota warning emails.
+...
