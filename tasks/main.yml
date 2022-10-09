@@ -3,7 +3,7 @@
   ansible.builtin.include_tasks: requirements.yml
   tags:
     - quota
-    - quota_requirements
+    - quota_req
 
 - name: Configure quota tasks
   block:
@@ -12,7 +12,7 @@
       ansible.builtin.include_tasks: checks.yml
       tags:
         - quota
-        - quota_checks
+        - quota_check
 
     - name: Include journaled tasks for Debian Bullseye and greater when aquota is not is use
       ansible.builtin.include_tasks: journaled.yml
