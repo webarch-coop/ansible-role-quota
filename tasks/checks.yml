@@ -119,7 +119,8 @@
         # quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query('quota_device_features[?key == `Filesystem features`]').value.split(" ") | list }}'
         # quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query('quota_device_features[?key == `Filesystem features`]') }}"
         # quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query('[?key == `Filesystem features`]') | split(' ') | list }}"
-        quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query('[?key == `Filesystem features`]') }}"
+        quota_device_features1: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query('[?key == `Filesystem features`].value') }}"
+        quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query('[?key == `Filesystem features`].value') | split(' ') | list }}"
 
     - name: "Debug {{ quota_device }} mount features array"
       ansible.builtin.debug:
