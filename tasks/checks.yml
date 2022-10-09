@@ -7,6 +7,7 @@
         that:
           - ansible_distribution_file_variety == "Debian"
           - ansible_distribution_major_version is version('9', '>=')
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Ensure that required variables are set
       ansible.builtin.assert:
@@ -15,6 +16,7 @@
           - (quota_dir is defined) and (quota_dir is regex('^\/[a-zA-Z0-9\/]{1,99}$'))
           - (quota_name is defined) and (quota_name is regex('[a-zA-Z0-9_-]{1,99}$'))
           - (quota_warn is defined) and (quota_warn | type_debug == "bool")
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Ensure that quota warn variables are set
       ansible.builtin.assert:
@@ -23,6 +25,7 @@
           - (quota_warn_subject is defined)
           - (quota_warn_cc is defined)
           - (quota_warn_support is defined)
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: quota_warn is defined
 
     - name: Debug ansible_local
@@ -62,6 +65,7 @@
         that:
           - quota_existing_grace_block is regex('^[0-9]+$')
           - quota_existing_grace_inode is regex('^[0-9]+$')
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
 
     - name: Debug the mounts
@@ -95,6 +99,7 @@
         that:
           - quota_device | length > 0
           - quota_device_options | length > 0
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg:
           - "It appears that {{ quota_dir }} is not a seperate disk, it needs to be one for quotas to be configured"
           - "you can manually check the device and device options using the following command"
@@ -142,6 +147,7 @@
       ansible.builtin.assert:
         that:
           - (quota_type == "aquota") or (quota_type == "journald")
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: quota_type is defined
 
     - name: "Check {{ quota_dir }} using quotaon"
@@ -165,6 +171,7 @@
         that:
           - (quota_enabled is defined)
           - (quota_enabled | type_debug == "bool")
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:

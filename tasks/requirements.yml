@@ -13,6 +13,7 @@
       ansible.builtin.assert:
         that:
           - quota_jc_which.rc == 0
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Set a fact for the path to JC
       ansible.builtin.set_fact:
