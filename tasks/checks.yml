@@ -25,13 +25,6 @@
           - (quota_warn_support is defined)
       when: quota_warn is defined
 
-    - name: Set empty variables for the quota type, device, device options and device features
-      ansible.builtin.set_fact:
-        quota_type: ""
-        quota_device: ""
-        quota_device_options: []
-        quota_device_features: []
-
     - name: Debug ansible_local
       ansible.builtin.debug:
         var: ansible_local
@@ -82,11 +75,10 @@
 
     - name: "Set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
+        # See vars/maim.yml for quota_device_query
         quota_device: "{{ quota_mounts | community.general.json_query(quota_device_query) }}"
+        # See vars/maim.yml for quota_device_options_query
         quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list }}"
-      vars:
-        quota_device_query: "[?mount == '{{ quota_dir }}'].device | [0]"
-        quota_device_options_query: "[?mount == '{{ quota_dir }}'].options | [0]"
 
     - name: Debug the quota device
       ansible.builtin.debug:
@@ -108,16 +100,6 @@
           - "you can manually check the device and device options using the following command"
           - "findmnt -fno SOURCE,OPTIONS --target {{ quota_dir }}"
 
-    - name: "Debug quota {{ quota_dir }} device"
-      ansible.builtin.debug:
-        var: quota_device
-        verbosity: 2
-
-    - name: "Debug {{ quota_device }} mount options array"
-      ansible.builtin.debug:
-        var: quota_device_options
-        verbosity: 2
-
     - name: "Debug {{ quota_device }} tune2fs listing"
       ansible.builtin.debug:
         var: ansible_local['tune2fs_' ~ quota_name]
@@ -125,9 +107,8 @@
 
     - name: Set a fact for the device features
       ansible.builtin.set_fact:
+        # See vars/main.yml for quota_device_features_query
         quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query(quota_device_features_query) | split(' ') | list }}"
-      vars:
-        quota_device_features_query: "[?key == 'Filesystem features'].value | [0]"
 
     - name: "Debug {{ quota_device }} mount features array"
       ansible.builtin.debug:
