@@ -87,7 +87,7 @@
         quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) }}"
       vars:
         quota_device_query: "[?mount == '{{ quota_dir }}'].device"
-        quota_device_options_query: "[?mount == '{{ quota_dir }}'].options"
+        quota_device_options_query: "[?mount == '{{ quota_dir }}'].options | [0]"
 # community.general.json_query('[?key == `Filesystem features`].value | [0]') | split(' ') | list }}"
     #   when: mnt.mount == quota_dir
     #   loop: "{{ ansible_facts.mounts }}"
