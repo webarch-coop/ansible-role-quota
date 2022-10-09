@@ -82,11 +82,12 @@
 
     - name: "Set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_device: "{{ quota_mounts | community.general.json_query(quota_query) }}"
+        quota_device: "{{ quota_mounts | community.general.json_query(quota_device_query) }}"
+        quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list }}"
       vars:
-        quota_query: "[?mount == '{{ quota_dir }}'].device"
+        quota_device_query: "[?mount == '{{ quota_dir }}'].device"
+        quota_device_options_query: "[?mount == '{{ quota_dir }}'].options"
 # community.general.json_query('[?key == `Filesystem features`].value | [0]') | split(' ') | list }}"
-    #   quota_device_options: "{{ (mnt.options).split(',') | list }}"
     #   when: mnt.mount == quota_dir
     #   loop: "{{ ansible_facts.mounts }}"
     #   loop_control:
@@ -95,6 +96,9 @@
 
     - debug:
         var: quota_device
+
+    - debug:
+        var: quota_device_options
 
     - fail:
 
