@@ -123,6 +123,8 @@
         var: quota_device_features
         verbosity: 2
 
+    - fail:
+
     # - name: "Loop through the filesystem features for {{ quota_device }} to set a variable containing an array of features"
     #   ansible.builtin.set_fact:
     #     quota_device_features: "{{ (line | regex_replace('^Filesystem features:\\s*')).split(' ') | list }}"
