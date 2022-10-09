@@ -71,6 +71,7 @@
   when: quota | bool
   tags:
     - quota
+    - quota_requirements
 
 - name: Packages, directories and files absent when not quota
   block:

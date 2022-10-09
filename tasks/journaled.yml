@@ -4,4 +4,5 @@
     msg: "Sorry this Ansible role doesn't yet support journald quota configuration, see this comment for how to enable it https://unix.stackexchange.com/a/688093/390046"
   tags:
     - quota
+    - quota_journald
 ...
