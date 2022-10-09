@@ -114,7 +114,7 @@
     - name: Set a fact for the device features
       ansible.builtin.set_fact: 
         # quota_device_features: '{{ ansible_local["tune2fs_" ~ quota_name].["Filesystem features"].split(" ") | list }}'
-        quota_device_features: '{{ ansible_local["tune2fs_" ~ quota_name] | community.general.json_query(`["Filesystem features"]`) }}'
+        quota_device_features: `{{ ansible_local["tune2fs_" ~ quota_name] | community.general.json_query('["Filesystem features"]') }}`
 
     - name: "Debug {{ quota_device }} mount features array"
       ansible.builtin.debug:
