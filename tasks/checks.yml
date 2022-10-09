@@ -149,44 +149,50 @@
         quota_type_aquota: true
       when: ("usrjquota=aquota.user" in quota_device_options)
 
-    - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
-      ansible.builtin.set_fact:
-        quota_type_aquota: true
-      when: opt == "usrjquota=aquota.user"
-      loop: "{{ quota_device_options }}"
-      loop_control:
-        extended: true
-        loop_var: opt
-        label: "option {{ ansible_loop.index }}"
+    # - name: "Loop through the {{ quota_device }} mount options to check if usrjquota=aquota.user is present"
+    #   ansible.builtin.set_fact:
+    #     quota_type_aquota: true
+    #   when: opt == "usrjquota=aquota.user"
+    #   loop: "{{ quota_device_options }}"
+    #   loop_control:
+    #     extended: true
+    #     loop_var: opt
+    #     label: "option {{ ansible_loop.index }}"
 
     - name: "Check if quota is present for {{ quota_device }}"
       ansible.builtin.set_fact:
         quota_type_journald: true
       when: ("quota" in quota_device_features)
 
-    - name: "Loop through the {{ quota_device }} features to check if quota is present"
-      ansible.builtin.set_fact:
-        quota_type_journald: true
-      when: feat == "quota"
-      loop: "{{ quota_device_features }}"
-      loop_control:
-        extended: true
-        loop_var: feat
-        label: "feature {{ ansible_loop.index }}"
+    # - name: "Loop through the {{ quota_device }} features to check if quota is present"
+    #   ansible.builtin.set_fact:
+    #     quota_type_journald: true
+    #   when: feat == "quota"
+    #   loop: "{{ quota_device_features }}"
+    #   loop_control:
+    #     extended: true
+    #     loop_var: feat
+    #     label: "feature {{ ansible_loop.index }}"
 
     - fail:
 
     - name: "Set a fact for the quota type for {{ quota_device }}"
       ansible.builtin.set_fact:
-        quota_type: "{% if quota_type_aquota %}aquota{% elif quota_type_journald %}journald{% endif %}"
-      when: >
-         ((quota_type_aquota is defined) and (quota_type_aquota) or
-         (quota_type_journald is defined) and (quota_type_journald))
+        quota_type: "{% if quota_type_aquota is defined and quota_type_aquota | bool %}aquota{% elif quota_type_journald is defined and quota_type_journald | bool %}journald{% endif %}"
+      when: >-
+         (quota_type_aquota is defined and quota_type_aquota | bool) or
+         (quota_type_journald is defined and quota_type_journald | bool)
 
     - name: "Debug the quota_type when defined"
       ansible.builtin.debug:
         var: quota_type
         verbosity: 2
+      when: quota_type is defined
+
+    - name: "Ensure that quota_type is valid if defined for {{ quota_dir }}"
+      ansible.builtin.assert:
+        that:
+          - (quota_type == "aquota") or (quota_type == "journald")
       when: quota_type is defined
 
     - name: "Check {{ quota_dir }} using quotaon"
@@ -204,12 +210,6 @@
     - name: "Set quota_enabled variable for {{ quota_dir }}"
       ansible.builtin.set_fact:
         quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}"
-
-    - name: "Ensure that quota_type is valid if defined for {{ quota_dir }}"
-      ansible.builtin.assert:
-        that:
-          - (quota_type == "aquota") or (quota_type == "journald")
-      when: quota_type is defined
 
     - name: "Ensure that quota_enabled is defined and a booolean for {{ quota_dir }}"
       ansible.builtin.assert:
