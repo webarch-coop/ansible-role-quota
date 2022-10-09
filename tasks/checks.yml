@@ -106,6 +106,11 @@
         var: quota_device_options
         verbosity: 2
 
+    - name: "Debug {{ quota_device }} tune2fs listing"
+      ansible.builtin.debug:
+        var: ansible_local['tune2fs_' ~ quota_name]
+        verbosity: 2
+
     - name: Set a fact for the device features
       ansible.builtin.set_fact: 
         quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name].['Filesystem features'] }}"
