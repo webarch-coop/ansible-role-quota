@@ -84,34 +84,29 @@
       ansible.builtin.set_fact:
         quota_device: "{{ quota_mounts | community.general.json_query(quota_device_query) }}"
         quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list }}"
-        # quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) }}"
       vars:
         quota_device_query: "[?mount == '{{ quota_dir }}'].device | [0]"
         quota_device_options_query: "[?mount == '{{ quota_dir }}'].options | [0]"
-# community.general.json_query('[?key == `Filesystem features`].value | [0]') | split(' ') | list }}"
+
+    - name: Debug the quota device
+      ansible.builtin.debug:
+        var: quota_device
+        verbosity: 2
+
+    - name: Debug quota device options
+      ansible.builtin.debug:
+        var: quota_device_options
+        verbosity: 2
+
+    # - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
+    #   ansible.builtin.set_fact:
+    #     quota_device: "{{ mnt.device }}"
+    #     quota_device_options: "{{ (mnt.options).split(',') | list }}"
     #   when: mnt.mount == quota_dir
     #   loop: "{{ ansible_facts.mounts }}"
     #   loop_control:
     #     loop_var: mnt
     #     label: "{{ mnt.mount }}"
-
-    - debug:
-        var: quota_device
-
-    - debug:
-        var: quota_device_options
-
-    - fail:
-
-    - name: "Loop through the Ansible mount facts to set device and mount options variables for {{ quota_dir }}"
-      ansible.builtin.set_fact:
-        quota_device: "{{ mnt.device }}"
-        quota_device_options: "{{ (mnt.options).split(',') | list }}"
-      when: mnt.mount == quota_dir
-      loop: "{{ ansible_facts.mounts }}"
-      loop_control:
-        loop_var: mnt
-        label: "{{ mnt.mount }}"
 
     - name: "Ensure that the device and device options for {{ quota_dir }} are not empty"
       ansible.builtin.assert:

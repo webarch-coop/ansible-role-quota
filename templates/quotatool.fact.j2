@@ -9,8 +9,9 @@ QUOTATOOL="{{ quota_quotatool }}"
 
 if [[ "${QUOTACHECK}" == "pass" ]]; then
   if [[ -f "${QUOTATOOL}" ]]; then
-    BLOCK_GRACE=$("${QUOTATOOL}" -v -n -u -b -t 86400 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
-    INODE_GRACE=$("${QUOTATOOL}" -v -n -u -i -t 86400 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $4 }')
+    # quotatool uses -n for dry run so the value isn't changed and only te old quota value is saved
+    BLOCK_GRACE=$("${QUOTATOOL}" -v -n -u -b -t 10 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $3 }')
+    INODE_GRACE=$("${QUOTATOOL}" -v -n -u -i -t 10 {{ quota_dir | quote }} 2>&1 | tail -n1 | awk '{ print $3 }')
     jo state=present block_grace="${BLOCK_GRACE}" inode_grace="${INODE_GRACE}"
   else
     jo state=absent
