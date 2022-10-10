@@ -15,15 +15,26 @@
           - quota_jc_which.rc == 0
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
+    # The -v option was introduced with 1.50.0 and Debian Bullseye ships with 1.14.0
+    # - name: Check the JC version
+    #   ansible.builtin.command: jc -v
+    #   check_mode: false
+    #   changed_when: false
+    #   register: quota_jc_version_check
+
+    # - name: Set a fact for the JC version
+    #   ansible.builtin.set_fact:
+    #     quota_jc_version: "{{ quota_jc_version_check.stdout_lines[0] | regex_replace('^jc version:') | trim }}"
+
     - name: Check the JC version
-      ansible.builtin.command: jc -v
+      ansible.builtin.command: jc -a
       check_mode: false
       changed_when: false
       register: quota_jc_version_check
 
     - name: Set a fact for the JC version
       ansible.builtin.set_fact:
-        quota_jc_version: "{{ quota_jc_which.stdout_lines[0] | regex_replace('^jc version:') | trim }}"
+        quota_jc_version: "{{ quota_jc_version_check.stdout | from_json | community.general.json_query('version') }}"
 
     - name: JC >= 1.22 is required
       ansible.builtin.assert:
