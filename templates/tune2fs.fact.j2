@@ -8,7 +8,7 @@ jc="{{ quota_jc }}"
 tune2fs="{{ quota_tune2fs }}"
 
 if [[ -f "${tune2fs}" && -f "${jc}" ]]; then
-  ${tune2fs} -l /dev/xvda4 | tail -n +2 | ${jc} --kv
+  ${tune2fs} -l /dev/xvda4 | tail -n +2 | ${jc} -m --kv
 else
   jo state=absent
 fi

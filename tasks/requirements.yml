@@ -15,6 +15,21 @@
           - quota_jc_which.rc == 0
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
+    - name: Check the JC version
+      ansible.builtin.command: jc -v
+      register: quota_jc_version_check
+      when: quota_jc_which.rc == 1
+
+    - name: Set a fact for the JC version
+      ansible.builtin.set_fact:
+        quota_jc_version: "{{ quota_jc_which.stdout_lines[0].split(' ')[2] | trim }}"
+
+    - name: JC >= 1.22 is required
+      ansible.builtin.assert:
+        that:
+          - quota_jc_version is version('1.22.0', '>=')
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
     - name: Set a fact for the path to JC
       ansible.builtin.set_fact:
         quota_jc: "{{ quota_jc_which.stdout }}"
