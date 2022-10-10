@@ -4,11 +4,11 @@
 
 set -euo pipefail
 
-TUNE2FS="{{ quota_tune2fs }}"
-JC="{{ quota_jc }}"
+jc="{{ quota_jc }}"
+tune2fs="{{ quota_tune2fs }}"
 
-if [[ -f "${TUNE2FS}" && -f "${JC}" ]]; then
-  ${TUNE2FS} -l /dev/xvda4 | tail -n +2 | ${JC} --kv
+if [[ -f "${tune2fs}" && -f "${jc}" ]]; then
+  ${tune2fs} -l /dev/xvda4 | tail -n +2 | ${jc} --kv
 else
   jo state=absent
 fi
