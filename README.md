@@ -1,4 +1,6 @@
-# Ansible Quota Role
+# Webarchitects Ansible Quota Role
+
+[![pipeline status](https://git.coop/webarch/quota/badges/master/pipeline.svg)](https://git.coop/webarch/quota/-/commits/master)
 
 This role currently only works with users quotas, not groups or projects, using `aquota`, `quota` version 2 on `ext2`, `ext3` and `ext4` filesystems, support for `journald` quotas should be added in the future.
 
@@ -38,6 +40,12 @@ To run everything use the `quota` tag.
 | quota_warn_signature |                                                                                                  | Signature for the quota warning emails.             |
 
 See the [defaults/main.yml](defaults/main.yml) file for the default settings.
+
+## Role repo
+
+The primary URL of this repo is [`https://git.coop/webarch/quota`](https://git.coop/webarch/quota) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-quota) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/quota).
+
+If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/quota/-/releases).
 
 ## Local facts
 
