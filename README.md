@@ -4,7 +4,7 @@ This role currently only works with users quotas, not groups or projects, using 
 
 This role is designed to configure one directory with users quotas, the `quota_dir` has to be a partition and this role will fail if it isn't, it defaults to `/home`.
 
-You can set users quotas by using the [users role](https://git.coop/webarch/users), the tasks for this in that role should be moved to this role in the future.
+You can set users quotas by using the [users role](https://git.coop/webarch/users), the tasks for this in that role should be rewritten and moved to this role in the future.
 
 ## Tags and check mode
 
