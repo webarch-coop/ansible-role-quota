@@ -45,6 +45,8 @@ This role installs three Bash scripts in `/etc/ansible/facts.d/` which generate 
 
 ### facts_local.quotatool_home
 
+* [templates/quotatool.fact.j2](templates/quotatool.fact.j2)
+
 ```bash
 /etc/ansible/facts.d/quotatool_home.fact | yq -P
 ```
@@ -55,6 +57,8 @@ inode_grace: 86400
 ```
 
 ### facts_local.repquota_home
+
+* [templates/repquota.fact.j2](templates/repquota.fact.j2)
 
 ```bash
 /etc/ansible/facts.d/repquota_home.fact | yq -P
@@ -95,6 +99,8 @@ inode_grace: 86400
   FileGrace: ""
 ```
 ### facts_local.tune2fs_home
+
+* [templates/tune2fs.fact.j2](templates/tune2fs.fact.j2)
 
 ```bash
 /etc/ansible/facts.d/repquota_home.fact | yq -P
