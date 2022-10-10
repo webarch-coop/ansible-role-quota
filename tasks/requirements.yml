@@ -17,8 +17,9 @@
 
     - name: Check the JC version
       ansible.builtin.command: jc -v
+      check_mode: false
+      changed_when: false
       register: quota_jc_version_check
-      when: quota_jc_which.rc == 0
 
     - name: Set a fact for the JC version
       ansible.builtin.set_fact:
