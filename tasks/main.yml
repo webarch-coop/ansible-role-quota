@@ -19,13 +19,15 @@
       ansible.builtin.include_tasks: journaled.yml
       when:
         - ansible_distribution_major_version is version('11', '>=')
-        - (quota_type is not defined) or (quota_type == "journaled")
+        - quota_type is defined
+        - quota_type == "journaled"
 
-    - name: Include aquota tasks for Debian Buster and Stretch or when aquota is in use
+    - name: Include aquota tasks for Debian Buster and Stretch or when aquota is in use or when quotas are not configured
       ansible.builtin.include_tasks: aquota.yml
       when: >-
-        ((ansible_distribution_major_version is version('11', '<'))
-        or ((quota_type is defined) and (quota_type == "aquota")))
+        (ansible_distribution_major_version is version('11', '<'))
+        or ((quota_type is defined) and (quota_type == "aquota"))
+        or (quota_type is not defined)
 
   when: (quota is defined) and (quota | bool)
   tags:
