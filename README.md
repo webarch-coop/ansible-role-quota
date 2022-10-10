@@ -6,6 +6,16 @@ This role is designed to configure one directory with users quotas, the `quota_d
 
 You can set users quotas by using the [users role](https://git.coop/webarch/users), the tasks for this in that role should be moved to this role in the future.
 
+## Tags and check mode
+
+The first time this role is run it needs to not be in check mode and as a minimum the `quota_req`, quota requirememts tag should be used so that the tasks in [tasks/requirements.yml](tasks/requirements.yml) are run.
+
+Once the requirements are in place then the role can be run in `--check` mode.
+
+To only run the checks you can use the `quota_check` tag.
+
+To run everything use the `quota` tag.
+
 ## Defaults
 
 | Variable             | Default value                                                                                    | Comments                                            |
@@ -31,9 +41,9 @@ See the [defaults/main.yml](defaults/main.yml) file for the default settings.
 
 ## Local facts
 
-This reol installs three Bash scripts in `/etc/ansible/facts.d/` which generate JSON that is available under `facts_local`, for example for a `/home` directory:
+This role installs three Bash scripts in `/etc/ansible/facts.d/` which generate JSON that is available under `facts_local`, for example for a `/home` directory:
 
-### quotatool_home.fact
+### facts_local.quotatool_home
 
 ```bash
 /etc/ansible/facts.d/quotatool_home.fact | yq -P
@@ -44,7 +54,7 @@ block_grace: 86400
 inode_grace: 86400
 ```
 
-### repquota_home.fact
+### facts_local.repquota_home
 
 ```bash
 /etc/ansible/facts.d/repquota_home.fact | yq -P
@@ -84,7 +94,7 @@ inode_grace: 86400
   FileHardLimit: "1048576"
   FileGrace: ""
 ```
-### tune2fs_home.fact
+### facts_local.tune2fs_home
 
 ```bash
 /etc/ansible/facts.d/repquota_home.fact | yq -P
@@ -112,7 +122,6 @@ Fragment size: "4096"
 Group descriptor size: "64"
 Reserved GDT blocks: "1024"
 Blocks per group: "32768"
-
 Fragments per group: "32768"
 Inodes per group: "8192"
 Inode blocks per group: "512"
@@ -138,11 +147,3 @@ Journal backup: inode blocks
 Checksum type: crc32c
 Checksum: "0xfba01192"
 ```
-
-## Tags and check mode
-
-The first time this role is run it needs to not be in check mode and as a minimum the `quota_req`, quota requirememts tag should be used so that the tasks in [tasks/requirements.yml](tasks/requirements.yml) are run.
-
-Once the requirements are in place then the role can be run in check mode.
-
-To only run the checks you can use the `quota_check` tag.
