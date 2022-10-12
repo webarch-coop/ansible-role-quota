@@ -41,9 +41,9 @@
             state: present
           register: quota_fstab_updated
 
-        - name: A reboot is required
-          ansible.builtin.fail:
-            msg: "Please reboot the server to ensure that the quota otions are applied to {{ quota_device }}"
+        - name: Reboot
+          ansible.builtin.reboot:
+            msg: "The server is being rebooted to ensure that the quota options are applied to {{ quota_device }}"
           when: (quota_fstab_updated is defined) and (quota_fstab_updated.changed | bool)
 
       when: ("quota" not in quota_device_options) or ("usrjquota=aquota.user" not in quota_device_options) or ("jqfmt=vfsv0" not in quota_device_options)
