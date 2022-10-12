@@ -10,9 +10,9 @@
     - name: Manual intervention needed
       ansible.builtin.fail:
         msg:
-          - "Please manually unmount the {{ quota_dir }} directory (stop services that run form it, unmount things mounted on it etc)"
-          - "Then run: tune2fs -O quota {{ quota_device }}"
-          - "Then reboot the server and re-run this role."
+          - "Please manually unmount the {{ quota_dir }} directory (stop services that run form it, unmount things mounted on it etc) and then run:"
+          - "tune2fs -O quota {{ quota_device }}"
+          - "Then reboot the server and re-run this role and also re-run the tasks to set the quotas as they need resetting when switching from aquota to journald."
       when: ("quota" not in quota_device_features)
 
   tags:
