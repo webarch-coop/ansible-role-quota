@@ -79,10 +79,12 @@
 
     - name: "Set device and mount options variables for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        # See vars/maim.yml for quota_device_query
+        # See vars/main.yml for quota_device_query
         quota_device: "{{ quota_mounts | community.general.json_query(quota_device_query) }}"
-        # See vars/maim.yml for quota_device_options_query
+        # See vars/main.yml for quota_device_options_query
         quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list }}"
+        # See vars/main.yml for quota_device_fstype_query
+        quota_device_fstype: "{{ quota_mounts | community.general.json_query(quota_device_fstype_query) }}"
 
     - name: Debug the quota device
       ansible.builtin.debug:

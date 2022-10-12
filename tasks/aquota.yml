@@ -20,6 +20,28 @@
         mode: 0600
       notify: Restart quota
 
+    - name: Update /etc/fstab to ensure quota, usrjquota=aquota.user and jqfmt=vfsv0 are included in device options
+      block:
+
+        - name: Set a fact for the list of required options in /etc/fstab
+          ansible.builtin.set_fact:
+            quota_device_aquota_options: "{{ quota_device_options | union(quota_device_aquota_options_required) }}"
+
+        - name: Debug list of required options in /etc/fstab
+          ansible.builtin.debug:
+            var: quota_device_aquota_options
+            verbosity: 2
+
+        - name: Quota device remounted with required options
+          ansible.posix.mount:
+            path: "{{ quota_dir }}"
+            src: "{{ quota_device }}"
+            fstype: "{{ quota_device_fstype }}"
+            opts: "{{ quota_device_aquota_options }}"
+            state: mounted
+
+      when: ("quota" not in quota_device_options) or ("usrjquota=aquota.user" not in quota_device_options) or ("jqfmt=vfsv0" not in quota_device_options)
+
     - name: Quota enabled and running
       ansible.builtin.service:
         name: quota

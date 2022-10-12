@@ -1,5 +1,10 @@
 ---
-quota_device_query: "[?mount == '{{ quota_dir }}'].device | [0]"
-quota_device_options_query: "[?mount == '{{ quota_dir }}'].options | [0]"
 quota_device_features_query: "[?key == 'Filesystem features'].value | [0]"
+quota_device_fstype_query: "[?mount == '{{ quota_dir }}'].fstype | [0]"
+quota_device_options_query: "[?mount == '{{ quota_dir }}'].options | [0]"
+quota_device_query: "[?mount == '{{ quota_dir }}'].device | [0]"
+quota_device_aquota_options_required:
+  - quota
+  - usrjquota=aquota.user
+  - jqfmt=vfsv0
 ...
