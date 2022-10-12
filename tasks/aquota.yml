@@ -29,7 +29,7 @@
           when: (quota_fstab_updated is defined) and (quota_fstab_updated.changed | bool)
 
         - name: Include quota check tasks
-            ansible.builtin.include_tasks: checks.yml
+          ansible.builtin.include_tasks: checks.yml
 
       when: ("quota" not in quota_device_options) or ("usrjquota=aquota.user" not in quota_device_options) or ("jqfmt=vfsv0" not in quota_device_options)
 
