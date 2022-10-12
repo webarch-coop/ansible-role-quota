@@ -33,6 +33,81 @@
           - "Then reboot the server and re-run this role and also re-run the tasks to set the quotas as they need resetting when switching from aquota to journald."
       when: ("quota" not in quota_device_features)
 
+    - name: Debug exists device options
+      ansible.builtin.debug:
+        var: quota_device_options
+        verbosity: 2
+
+    - name: Set a fact for the list of required options in /etc/fstab
+      ansible.builtin.set_fact:
+        quota_device_journaled_options: "{{ quota_device_options | difference(quota_device_aquota_options_required) | join(',') }}"
+
+    - name: Debug list of required options in /etc/fstab
+      ansible.builtin.debug:
+        var: quota_device_journaled_options
+        verbosity: 2
+
+    - name: Quota device remounted with required options
+      ansible.posix.mount:
+        path: "{{ quota_dir }}"
+        src: "{{ quota_device }}"
+        fstype: "{{ quota_device_fstype }}"
+        opts: "{{ quota_device_journaled_options }}"
+        state: present
+      register: quota_journaled_fstab_updated
+
+    - name: Reboot
+      ansible.builtin.reboot:
+        msg: "The server is being rebooted to ensure that the quota options are applied to {{ quota_device }}"
+      when: (quota_journaled_fstab_updated is defined) and (quota_journaled_fstab_updated.changed | bool)
+
+    - name: Include quota check tasks
+      ansible.builtin.include_tasks: checks.yml
+
+    - name: Quota enabled and running
+      ansible.builtin.service:
+        name: quota
+        state: started
+
+    - name: "Run quotaon {{ quota_dir }}"
+      ansible.builtin.command: "quotaon {{ quota_dir }}"
+      register: quota_quotaon
+      when: not quota_enabled
+      failed_when: ("Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout)
+
+    - name: Debug quotaon results
+      ansible.builtin.debug:
+        var: quota_quotaon
+        verbosity: 2
+      when: quota_quotaon is defined
+
+    - name: "Set the gracetimes for {{ quota_dir }}"
+      ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
+      when:
+        - quota_quotaon is defined
+        - ((quota_existing_grace_block | int) != (quota_grace_block | int)) or ((quota_existing_grace_inode | int) != (quota_grace_inode | int))
+
+    - name: Quota warning config in place
+      ansible.builtin.template:
+        src: warnquota.conf.j2
+        dest: /etc/warnquota.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Quota warning defaults in place
+      ansible.builtin.template:
+        src: quota.j2
+        dest: /etc/default/quota
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Warn that a reboot might be needed
+      ansible.builtin.debug:
+        msg: "You might need to reboot this server before the disk quotas are applied"
+      when: not quota_enabled
+
   tags:
     - quota
     - quota_journald
