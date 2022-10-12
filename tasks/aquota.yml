@@ -25,7 +25,7 @@
 
         - name: Set a fact for the list of required options in /etc/fstab
           ansible.builtin.set_fact:
-            quota_device_aquota_options: "{{ quota_device_options | union(quota_device_aquota_options_required) | join(,) }}"
+            quota_device_aquota_options: "{{ quota_device_options | union(quota_device_aquota_options_required) | join(',') }}"
 
         - name: Debug list of required options in /etc/fstab
           ansible.builtin.debug:
