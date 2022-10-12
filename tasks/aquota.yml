@@ -38,7 +38,7 @@
             src: "{{ quota_device }}"
             fstype: "{{ quota_device_fstype }}"
             opts: "{{ quota_device_aquota_options }}"
-            state: mounted
+            state: present
 
       when: ("quota" not in quota_device_options) or ("usrjquota=aquota.user" not in quota_device_options) or ("jqfmt=vfsv0" not in quota_device_options)
 
