@@ -2,24 +2,6 @@
 - name: Enable and configue quotas using aquota
   block:
 
-    - name: "{{ quota_device }}:{{ quota_name }} present in /etc/quotatab"
-      ansible.builtin.lineinfile:
-        dest: /etc/quotatab
-        line: "{{ quota_device }}:{{ quota_name }}"
-        state: present
-      notify: Restart quota
-
-    - name: "Touch {{ quota_dir }}/aquota.user"
-      ansible.builtin.file:
-        path: "{{ quota_dir }}/aquota.user"
-        state: touch
-        access_time: preserve
-        modification_time: preserve
-        owner: root
-        group: root
-        mode: 0600
-      notify: Restart quota
-
     - name: Update /etc/fstab to ensure quota, usrjquota=aquota.user and jqfmt=vfsv0 are included in device options
       block:
 
@@ -46,7 +28,28 @@
             msg: "The server is being rebooted to ensure that the quota options are applied to {{ quota_device }}"
           when: (quota_fstab_updated is defined) and (quota_fstab_updated.changed | bool)
 
+        - name: Include quota check tasks
+            ansible.builtin.include_tasks: checks.yml
+
       when: ("quota" not in quota_device_options) or ("usrjquota=aquota.user" not in quota_device_options) or ("jqfmt=vfsv0" not in quota_device_options)
+
+    - name: "{{ quota_device }}:{{ quota_name }} present in /etc/quotatab"
+      ansible.builtin.lineinfile:
+        dest: /etc/quotatab
+        line: "{{ quota_device }}:{{ quota_name }}"
+        state: present
+      notify: Restart quota
+
+    - name: "Touch {{ quota_dir }}/aquota.user"
+      ansible.builtin.file:
+        path: "{{ quota_dir }}/aquota.user"
+        state: touch
+        access_time: preserve
+        modification_time: preserve
+        owner: root
+        group: root
+        mode: 0600
+      notify: Restart quota
 
     - name: Quota enabled and running
       ansible.builtin.service:
