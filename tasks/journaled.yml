@@ -1,7 +1,20 @@
 ---
-- name: Fail as journald quota support has yet to be implemented
-  ansible.builtin.fail:
-    msg: "Sorry this Ansible role doesn't yet support journald quota configuration, see this comment for how to enable it https://unix.stackexchange.com/a/688093/390046"
+- name: Journaled usrquota
+  block:
+
+    - name: Move the aquota.user file if it exists to /root/aquota.user.bak
+      ansible.builtin.command: "mv {{ quota_dir }}/aquota.user /root/aquota.user.bak"
+      changed_when: true
+      when: quota_aquota_users_file.stat.exists | bool
+
+    - name: Manual intervention needed
+      ansible.builtin.fail:
+        msg:
+          - "Please manually unmount the {{ quota_dir }} directory (stop services that run form it, unmount things mounted on it etc)"
+          - "Then run: tune2fs -O quota {{ quota_device }}"
+          - "Then reboot the server and re-run this role."
+      when: ("quota" not in quota_device_features)
+
   tags:
     - quota
     - quota_journald

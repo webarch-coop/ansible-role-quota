@@ -5,6 +5,11 @@
     - name: Update /etc/fstab to ensure quota, usrjquota=aquota.user and jqfmt=vfsv0 are included in device options
       block:
 
+        - name: Debug exists device options
+          ansible.builtin.debug:
+            var: quota_device_options
+            verbosity: 2
+
         - name: Set a fact for the list of required options in /etc/fstab
           ansible.builtin.set_fact:
             quota_device_aquota_options: "{{ quota_device_options | union(quota_device_aquota_options_required) | join(',') }}"

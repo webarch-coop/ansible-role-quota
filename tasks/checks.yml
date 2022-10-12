@@ -28,6 +28,11 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: quota_warn is defined
 
+    - name: Check if a aquota.user file is present
+      ansible.builtin.stat:
+        path: "{{ quota_dir }}/aquota.user"
+      register: quota_aquota_users_file
+
     - name: Debug ansible_local
       ansible.builtin.debug:
         var: ansible_local
