@@ -2,6 +2,24 @@
 - name: Enable and configue quotas using aquota
   block:
 
+    - name: Manual intervention needed to upgrade ext2 to ext4
+      ansible.builtin.fail:
+        msg:
+          - "Please manually unmount the {{ quota_dir }} directory (stop services that run from it, unmount things mounted on it etc) and then run:"
+          - "tune2fs -O extents,uninit_bg,dir_index,has_journal {{ quota_device }}"
+          - "e2fsck -pf {{ quota_device }}"
+          - "Then edit the filesystem version in /etc/fstab and reboot the server and re-run this role."
+      when: quota_device_fstype == "ext2"
+
+    - name: Manual intervention needed to upgrade ext3 to ext4
+      ansible.builtin.fail:
+        msg:
+          - "Please manually unmount the {{ quota_dir }} directory (stop services that run from it, unmount things mounted on it etc) and then run:"
+          - "tune2fs -O extents,uninit_bg,dir_index {{ quota_device }}"
+          - "e2fsck -pf {{ quota_device }}"
+          - "Then edit the filesystem version in /etc/fstab and reboot the server and re-run this role."
+      when: quota_device_fstype == "ext3"
+
     - name: Update /etc/fstab to ensure quota, usrjquota=aquota.user and jqfmt=vfsv0 are included in device options
       block:
 

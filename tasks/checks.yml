@@ -2,11 +2,16 @@
 - name: Check the quota status
   block:
 
-    - name: Check that the OS is Debian Stretch or above
+    - name: Set a fact for the Linux kernel version
+      ansible.builtin.set_fact:
+        quota_linux_kernel: "{{ ansible_kernel | regex_replace('-.*$') }}"
+
+    - name: Check that the OS is Debian Stretch or above running Linux 2.6.28 or above
       ansible.builtin.assert:
         that:
           - ansible_distribution_file_variety == "Debian"
           - ansible_distribution_major_version is version('9', '>=')
+          - quota_linux_kernel is version('2.6.28', '>')
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Ensure that required variables are set
@@ -32,6 +37,11 @@
       ansible.builtin.stat:
         path: "{{ quota_dir }}/aquota.user"
       register: quota_aquota_users_file
+
+    - name: Debug aquota.user file check
+      ansible.builtin.debug:
+        var: quota_aquota_users_file
+        verbosity: 2
 
     - name: Debug ansible_local
       ansible.builtin.debug:
@@ -95,6 +105,12 @@
       ansible.builtin.debug:
         var: quota_device
         verbosity: 2
+
+    - name: Only ext2, ext3 and ext4 filesystems are supported
+      ansible.builtin.assert:
+        that:
+          - quota_device_fstype is regex('^ext[2|3|4]$')
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Debug quota device options
       ansible.builtin.debug:
