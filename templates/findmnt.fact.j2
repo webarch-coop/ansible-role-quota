@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-findmnt=$(type -P findmnt2 || echo "absent")
+findmnt=$(type -P findmnt || echo "absent")
 jo=$(type -P jo || echo "absent")
 
 if [[ "${findmnt}" != "absent" ]]; then
