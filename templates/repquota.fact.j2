@@ -4,10 +4,10 @@
 
 set -euo pipefail
 
-jc=(type -P jc || echo "absent")
+jc=$(type -P jc || echo "absent")
 jo=$(type -P jo || echo "absent")
 quota=$(type -P quota || echo "absent")
-repquota=(type -P repquota || echo "absent")
+repquota=$(type -P repquota || echo "absent")
 
 if [[ "${quota}" != "absent" ]]; then
   quotacheck=$("${quota}" -f "{{ quota_dir }}" > /dev/null && echo "pass" || echo "fail")
