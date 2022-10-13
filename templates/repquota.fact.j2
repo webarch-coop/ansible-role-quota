@@ -4,11 +4,26 @@
 
 set -euo pipefail
 
-jc="{{ quota_jc }}"
-repquota="{{ quota_repquota }}"
+jc=(type -P jc || echo "absent")
+jo=$(type -P jo || echo "absent")
+quota=$(type -P quota || echo "absent")
+repquota=(type -P repquota || echo "absent")
 
-if [[ -f "${jc}" && -f "${repquota}" && -f "{{ quota_dir }}/aquota.user" ]]; then
-  ${repquota} "{{ quota_dir }}" -O csv | ${jc} -m --csv 
+if [[ "${quota}" != "absent" ]]; then
+  quotacheck=$("${quota}" -f "{{ quota_dir }}" > /dev/null && echo "pass" || echo "fail")
+  if [[ "${jc}" != "absent" && "${repquota}" != "absent" && "${quotacheck}" == "pass" ]]; then
+    "${repquota}" "{{ quota_dir }}" -O csv | "${jc}" -m --csv 
+  else
+    if [[ "${jo}" != "absent" ]]; then
+      "${jo}" state=absent
+    else
+      echo '{"state":"absent"}'
+    fi
+  fi
 else
-  jo state=absent
+  if [[ "${jo}" != "absent" ]]; then
+    "${jo}" state=absent
+  else
+    echo '{"state":"absent"}'
+  fi
 fi

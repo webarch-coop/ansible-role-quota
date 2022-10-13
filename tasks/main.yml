@@ -5,6 +5,13 @@
     - quota
     - quota_req
 
+- name: Include quota local fact tasks
+  ansible.builtin.include_tasks: local_facts.yml
+  tags:
+    - quota
+    - quota_local_facts
+    - quota_req
+
 - name: Include quota check tasks
   ansible.builtin.include_tasks: checks.yml
   when: (quota is defined) and (quota | bool)

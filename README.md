@@ -10,7 +10,7 @@ You can set users quotas by using the [users role](https://git.coop/webarch/user
 
 ## Tags and check mode
 
-The first time this role is run it needs to not be in check mode and as a minimum the `quota_req`, quota requirememts tag should be used so that the tasks in [tasks/requirements.yml](tasks/requirements.yml) are run.
+The first time this role is run it needs to not be in check mode and as a minimum the `quota_req`, quota requirememts tag should be used so that the tasks in [tasks/requirements.yml](tasks/requirements.yml) and [tasks/local_facts.yml](tasks/local_facts.yml) are run.
 
 Once the requirements are in place then the role can be run in `--check` mode.
 

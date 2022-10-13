@@ -1,135 +1,24 @@
 ---
-- name: Packages, directories and files present when quota
-  block:
-
-    - name: Which jc
-      ansible.builtin.command: which jc
-      check_mode: false
-      changed_when: false
-      register: quota_jc_which
-      failed_when: quota_jc_which.rc is not regex('^0|1$')
-
-    - name: JC is required
-      ansible.builtin.assert:
-        that:
-          - quota_jc_which.rc == 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-
-    # The -v option was introduced with 1.50.0 and Debian Bullseye ships with 1.14.0
-    # - name: Check the JC version
-    #   ansible.builtin.command: jc -v
-    #   check_mode: false
-    #   changed_when: false
-    #   register: quota_jc_version_check
-
-    # - name: Set a fact for the JC version
-    #   ansible.builtin.set_fact:
-    #     quota_jc_version: "{{ quota_jc_version_check.stdout_lines[0] | regex_replace('^jc version:') | trim }}"
-
-    - name: Check the JC version
-      ansible.builtin.command: jc -a
-      check_mode: false
-      changed_when: false
-      register: quota_jc_version_check
-
-    - name: Set a fact for the JC version
-      ansible.builtin.set_fact:
-        quota_jc_version: "{{ quota_jc_version_check.stdout | from_json | community.general.json_query('version') }}"
-
-    - name: JC >= 1.22 is required
-      ansible.builtin.assert:
-        that:
-          - quota_jc_version is version('1.22.0', '>=')
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-
-    - name: Set a fact for the path to JC
-      ansible.builtin.set_fact:
-        quota_jc: "{{ quota_jc_which.stdout }}"
-
-    - name: Packages present
-      ansible.builtin.apt:
-        pkg:
-          - jo
-          - quota
-          - quotatool
-        state: present
-
-    - name: Ansible facts.d directory present
-      ansible.builtin.file:
-        path: /etc/ansible/facts.d
-        state: directory
-        recurse: true
-        mode: 0755
-        owner: root
-        group: root
-
-    - name: "Ansible local facts repquota script present for {{ quota_name }}"
-      ansible.builtin.template:
-        src: repquota.fact.j2
-        dest: "/etc/ansible/facts.d/repquota_{{ quota_name }}.fact"
-        mode: 0755
-        owner: root
-        group: root
-      register: quota_repquota_facts
-
-    - name: "Ansible local facts quotatool script present for {{ quota_name }}"
-      ansible.builtin.template:
-        src: quotatool.fact.j2
-        dest: "/etc/ansible/facts.d/quotatool_{{ quota_name }}.fact"
-        mode: 0755
-        owner: root
-        group: root
-      register: quota_quotatool_facts
-
-    - name: "Ansible local facts tune2fs script present for {{ quota_name }}"
-      ansible.builtin.template:
-        src: tune2fs.fact.j2
-        dest: "/etc/ansible/facts.d/tune2fs_{{ quota_name }}.fact"
-        mode: 0755
-        owner: root
-        group: root
-      register: quota_tune2fs_facts
-
-    - name: Re-read Ansible local facts
-      ansible.builtin.setup:
-        filter: ansible_local
-      when: (quota_repquota_facts.changed | bool) or (quota_quotatool_facts.changed | bool) or (quota_tune2fs_facts | bool)
-
+- name: Packages present when quota
+  ansible.builtin.apt:
+    pkg:
+      - jo
+      - quota
+      - quotatool
+    state: present
   when: quota | bool
   tags:
     - quota
     - quota_req
 
-- name: Packages, directories and files absent when not quota
-  block:
-
-    - name: "Ansible local facts repquota script for {{ quota_name }} absent when not quota"
-      ansible.builtin.file:
-        path: "/etc/ansible/facts.d/repquota_{{ quota_name }}.fact"
-        state: absent
-
-    - name: "Ansible local facts quotatool script for {{ quota_name }} absent when not quota"
-      ansible.builtin.file:
-        path: "/etc/ansible/facts.d/quotatool_{{ quota_name }}.fact"
-        state: absent
-
-    - name: "Ansible local facts tune2fs script for {{ quota_name }} absent when not quota"
-      ansible.builtin.file:
-        path: "/etc/ansible/facts.d/tune2fs_{{ quota_name }}.fact"
-        state: absent
-
-    - name: Packages absent
-      ansible.builtin.apt:
-        pkg:
-          - quota
-          - quotatool
-        state: absent
-        autoclean: true
-        autoremove: true
-
-    - name: Re-read Ansible facts
-      ansible.builtin.setup:
-
+- name: Packages absent when not quota
+  ansible.builtin.apt:
+    pkg:
+      - quota
+      - quotatool
+    state: absent
+    autoclean: true
+    autoremove: true
   when: not quota | bool
   tags:
     - quota
