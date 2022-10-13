@@ -25,18 +25,6 @@ argument_specs:
         type: int
         required: true
         description: The quota grace time for inodes.
-      quota_repquota:
-        type: str
-        required: true
-        description: The path to repquota.
-      quota_quotatool:
-        type: str
-        required: true
-        description: The path to quotatool.
-      quota_tune2fs:
-        type: str
-        required: true
-        description: The path to tune2fs.
       quota_warn:
         type: bool
         required: true
