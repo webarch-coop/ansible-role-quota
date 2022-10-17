@@ -83,7 +83,7 @@
 
       when:
         - ansible_local['quotatool_' ~ quota_name] is defined
-        - ansible_local['quotatool_' ~ quota_name].state == "present"
+        - ansible_local['quotatool_' ~ quota_name].state != "absent"
 
     - name: Debug the mounts
       ansible.builtin.debug:
@@ -148,9 +148,7 @@
             var: quota_device_features
             verbosity: 2
 
-      when:
-        - ansible_local['tune2fs_' ~ quota_name] is defined
-        - ansible_local['tune2fs_' ~ quota_name].state == "present"
+      when: ansible_local['tune2fs_' ~ quota_name] is defined
 
     - name: "Check if usrjquota=aquota.user is present for {{ quota_device }}"
       ansible.builtin.set_fact:
