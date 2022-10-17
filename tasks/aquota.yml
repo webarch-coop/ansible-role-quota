@@ -44,12 +44,12 @@
             fstype: "{{ quota_device_fstype }}"
             opts: "{{ quota_device_aquota_options }}"
             state: present
-          register: quota_fstab_updated
+          register: quota_aquota_fstab_updated
 
         - name: Reboot
           ansible.builtin.reboot:
             msg: "The server is being rebooted to ensure that the quota options are applied to {{ quota_device }}"
-          when: (quota_fstab_updated is defined) and (quota_fstab_updated.changed | bool)
+          when: (quota_aquota_fstab_updated is defined) and (quota_aquota_fstab_updated.changed | bool)
 
         - name: Include quota check tasks
           ansible.builtin.include_tasks: checks.yml
