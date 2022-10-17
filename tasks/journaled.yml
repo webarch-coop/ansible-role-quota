@@ -84,7 +84,7 @@
       when: quota_quotaon is defined
 
     - name: "Check that quota is enabled for {{ quota_dir }}"
-      ansible.builtin.command: "quotacheck {{ quota_dir }}"
+      ansible.builtin.command: "quotaon -p {{ quota_dir }}"
       changed_when: false
       check_mode: false
 
