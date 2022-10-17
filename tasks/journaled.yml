@@ -90,7 +90,7 @@
       register: quota_quotaon_print
       # failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or ("is on" not in quota_quotaon_print_state.stdout_lines[1])
       # quota_quotaon_print_user is defined in /vars/main.yml
-      failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or (quota_quotaon_print_state.stdout_lines[1] != quota_quotaon_print_user)
+      failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or (quota_quotaon_print.stdout_lines[1] != quota_quotaon_print_user)
 
     - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
