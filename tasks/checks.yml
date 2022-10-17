@@ -187,10 +187,17 @@
       register: quota_quotaon
       failed_when: quota_quotaon.rc is not regex('0|1')
 
-    - name: "Debug the output from quotaon -pu {{ quota_dir }}"
+    - name: "Debug the standard output from quotaon -pu {{ quota_dir }}"
       ansible.builtin.debug:
         var: quota_quotaon.stdout
         verbosity: 2
+      when: quota_quotaon.stdout | length > 0
+
+    - name: "Debug the standard error from quotaon -pu {{ quota_dir }}"
+      ansible.builtin.debug:
+        var: quota_quotaon.stderr
+        verbosity: 2
+      when: quota_quotaon.stderr | length > 0
 
     - name: "Set quota_enabled variable for {{ quota_dir }}"
       ansible.builtin.set_fact:
