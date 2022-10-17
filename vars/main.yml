@@ -7,4 +7,5 @@ quota_device_aquota_options_required:
   - quota
   - usrjquota=aquota.user
   - jqfmt=vfsv0
+quota_quotaon_print_user: "user quota on {{ quota_dir }} ({{ quota_device }}) is on"
 ...
