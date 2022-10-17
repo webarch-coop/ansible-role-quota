@@ -43,45 +43,45 @@
         var: quota_aquota_users_file
         verbosity: 2
 
-    - name: Debug ansible_local
-      ansible.builtin.debug:
-        var: ansible_local
-        verbosity: 2
+    - name: Set grace variables
+      block:
 
-    - name: "Set a variable for the grace array for {{ quota_dir }}"
-      ansible.builtin.set_fact:
-        quota_grace_array: "{{ ansible_local['quotatool_' ~ quota_name] }}"
+        - name: "Set a variable for the grace array for {{ quota_dir }}"
+          ansible.builtin.set_fact:
+            quota_grace_array: "{{ ansible_local['quotatool_' ~ quota_name] }}"
 
-    - name: "Debug grace quota array for {{ quota_dir }}"
-      ansible.builtin.debug:
-        var: quota_grace_array
-        verbosity: 2
+        - name: "Debug grace quota array for {{ quota_dir }}"
+          ansible.builtin.debug:
+            var: quota_grace_array
+            verbosity: 2
 
-    - name: "Set variables for existing block and inode grace time in seconds for {{ quota_dir }}"
-      ansible.builtin.set_fact:
-        quota_existing_grace_block: "{{ quota_grace_array.block_grace | int }}"
-        quota_existing_grace_inode: "{{ quota_grace_array.inode_grace | int }}"
-      when: quota_grace_array.state == "present"
+        - name: "Set variables for existing block and inode grace time in seconds for {{ quota_dir }}"
+          ansible.builtin.set_fact:
+            quota_existing_grace_block: "{{ quota_grace_array.block_grace | int }}"
+            quota_existing_grace_inode: "{{ quota_grace_array.inode_grace | int }}"
+          when: quota_grace_array.state == "present"
 
-    - name: "Existing block grace time in seconds for {{ quota_dir }}"
-      ansible.builtin.debug:
-        var: quota_existing_grace_block
-        verbosity: 2
-      when: quota_existing_grace_block is defined
+        - name: "Existing block grace time in seconds for {{ quota_dir }}"
+          ansible.builtin.debug:
+            var: quota_existing_grace_block
+            verbosity: 2
+          when: quota_existing_grace_block is defined
 
-    - name: "Existing inode grace time in seconds for {{ quota_dir }}"
-      ansible.builtin.debug:
-        var: quota_existing_grace_inode
-        verbosity: 2
-      when: quota_existing_grace_inode is defined
+        - name: "Existing inode grace time in seconds for {{ quota_dir }}"
+          ansible.builtin.debug:
+            var: quota_existing_grace_inode
+            verbosity: 2
+          when: quota_existing_grace_inode is defined
 
-    - name: Ensure that block and inode grace times consist of numbers when defined
-      ansible.builtin.assert:
-        that:
-          - quota_existing_grace_block is regex('^[0-9]+$')
-          - quota_existing_grace_inode is regex('^[0-9]+$')
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
+        - name: Ensure that block and inode grace times consist of numbers when defined
+          ansible.builtin.assert:
+            that:
+              - quota_existing_grace_block is regex('^[0-9]+$')
+              - quota_existing_grace_inode is regex('^[0-9]+$')
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
+
+      when: ansible_local['quotatool_' ~ quota_name].state == "present"
 
     - name: Debug the mounts
       ansible.builtin.debug:
