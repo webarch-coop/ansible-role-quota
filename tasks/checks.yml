@@ -81,7 +81,9 @@
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
 
-      when: ansible_local['quotatool_' ~ quota_name] is defined
+      when:
+        - ansible_local['quotatool_' ~ quota_name] is defined
+        - ansible_local['quotatool_' ~ quota_name].state == "present"
 
     - name: Debug the mounts
       ansible.builtin.debug:
@@ -128,20 +130,27 @@
           - "you can manually check the device and device options using the following command"
           - "findmnt -fno SOURCE,OPTIONS --target {{ quota_dir }}"
 
-    - name: "Debug {{ quota_device }} tune2fs listing"
-      ansible.builtin.debug:
-        var: ansible_local['tune2fs_' ~ quota_name]
-        verbosity: 2
+    - name: Create an array of the device features
+      block:
 
-    - name: Set a fact for the device features
-      ansible.builtin.set_fact:
-        # See vars/main.yml for quota_device_features_query
-        quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query(quota_device_features_query) | split(' ') | list }}"
+        - name: "Debug {{ quota_device }} tune2fs listing"
+          ansible.builtin.debug:
+            var: ansible_local['tune2fs_' ~ quota_name]
+            verbosity: 2
 
-    - name: "Debug {{ quota_device }} mount features array"
-      ansible.builtin.debug:
-        var: quota_device_features
-        verbosity: 2
+        - name: Set a fact for the device features
+          ansible.builtin.set_fact:
+            # See vars/main.yml for quota_device_features_query
+            quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query(quota_device_features_query) | split(' ') | list }}"
+
+        - name: "Debug {{ quota_device }} mount features array"
+          ansible.builtin.debug:
+            var: quota_device_features
+            verbosity: 2
+
+      when:
+        - ansible_local['tune2fs_' ~ quota_name] is defined
+        - ansible_local['tune2fs_' ~ quota_name].state == "present"
 
     - name: "Check if usrjquota=aquota.user is present for {{ quota_device }}"
       ansible.builtin.set_fact:
