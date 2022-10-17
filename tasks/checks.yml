@@ -81,7 +81,9 @@
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
 
-      when: ansible_local['quotatool_' ~ quota_name].state == "present"
+      when:
+        - ansible_local['quotatool_' ~ quota_name] is defined
+        - ansible_local['quotatool_' ~ quota_name].state == "present"
 
     - name: Debug the mounts
       ansible.builtin.debug:
