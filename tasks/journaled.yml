@@ -83,14 +83,22 @@
         verbosity: 2
       when: quota_quotaon is defined
 
+    - name: Debug quotaon -p user expected result
+      ansible,builtin.debug:
+        var: quota_quotaon_print_user
+        verbosity: 2
+
     - name: "Check that quota is enabled for {{ quota_dir }}"
       ansible.builtin.command: "quotaon -p {{ quota_dir }}"
       changed_when: false
       check_mode: false
       register: quota_quotaon_print
-      # failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or ("is on" not in quota_quotaon_print_state.stdout_lines[1])
-      # quota_quotaon_print_user is defined in /vars/main.yml
       failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or (quota_quotaon_print.stdout_lines[1] != quota_quotaon_print_user)
+
+    - name: Debug quotaon -p user result
+      ansible,builtin.debug:
+        var: quota_quotaon_print.stdout_lines[1]
+        verbosity: 2
 
     - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
