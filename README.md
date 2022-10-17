@@ -51,6 +51,144 @@ If you use this role please use a tagged release, see [the release notes](https:
 
 This role installs three Bash scripts in `/etc/ansible/facts.d/` which generate JSON that is available under `facts_local`, for example for a `/home` directory:
 
+### facts_local.findmnt
+
+* [templates/findmnt.fact.j2](templates/findmnt.fact.j2)
+
+```bash
+/etc/ansible/facts.d/findmnt.fact | yq -P
+```
+```yaml
+filesystems:
+  - target: /
+    source: /dev/xvda2
+    fstype: ext4
+    options: rw,relatime,errors=remount-ro
+    children:
+      - target: /sys
+        source: sysfs
+        fstype: sysfs
+        options: rw,nosuid,nodev,noexec,relatime
+        children:
+          - target: /sys/kernel/security
+            source: securityfs
+            fstype: securityfs
+            options: rw,nosuid,nodev,noexec,relatime
+          - target: /sys/fs/cgroup
+            source: cgroup2
+            fstype: cgroup2
+            options: rw,nosuid,nodev,noexec,relatime,nsdelegate
+          - target: /sys/fs/pstore
+            source: pstore
+            fstype: pstore
+            options: rw,nosuid,nodev,noexec,relatime
+          - target: /sys/fs/bpf
+            source: bpf
+            fstype: bpf
+            options: rw,nosuid,nodev,noexec,relatime,mode=700
+          - target: /sys/kernel/debug
+            source: debugfs
+            fstype: debugfs
+            options: rw,nosuid,nodev,noexec,relatime
+          - target: /sys/kernel/tracing
+            source: tracefs
+            fstype: tracefs
+            options: rw,nosuid,nodev,noexec,relatime
+          - target: /sys/kernel/config
+            source: configfs
+            fstype: configfs
+            options: rw,nosuid,nodev,noexec,relatime
+          - target: /sys/fs/fuse/connections
+            source: fusectl
+            fstype: fusectl
+            options: rw,nosuid,nodev,noexec,relatime
+      - target: /proc
+        source: proc
+        fstype: proc
+        options: rw,relatime
+        children:
+          - target: /proc/sys/fs/binfmt_misc
+            source: systemd-1
+            fstype: autofs
+            options: rw,relatime,fd=30,pgrp=1,timeout=0,minproto=5,maxproto=5,direct,pipe_ino=10259
+      - target: /dev
+        source: udev
+        fstype: devtmpfs
+        options: rw,nosuid,relatime,size=4056296k,nr_inodes=1014074,mode=755
+        children:
+          - target: /dev/pts
+            source: devpts
+            fstype: devpts
+            options: rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000
+          - target: /dev/shm
+            source: tmpfs
+            fstype: tmpfs
+            options: rw,nosuid,nodev
+          - target: /dev/mqueue
+            source: mqueue
+            fstype: mqueue
+            options: rw,nosuid,nodev,noexec,relatime
+      - target: /run
+        source: tmpfs
+        fstype: tmpfs
+        options: rw,nosuid,noexec,relatime,size=820348k,mode=755
+        children:
+          - target: /run/lock
+            source: tmpfs
+            fstype: tmpfs
+            options: rw,nosuid,nodev,noexec,relatime,size=5120k
+          - target: /run/user/1000
+            source: tmpfs
+            fstype: tmpfs
+            options: rw,nosuid,nodev,relatime,size=820348k,nr_inodes=205087,mode=700,uid=1000,gid=1001
+      - target: /home
+        source: /dev/xvda4
+        fstype: ext4
+        options: rw,nosuid,nodev,relatime
+      - target: /var
+        source: /dev/xvda3
+        fstype: ext4
+        options: rw,relatime,errors=remount-ro
+        children:
+          - target: /var/www/users/wiki
+            source: /dev/xvda4[/wiki]
+            fstype: ext4
+            options: rw,nosuid,nodev,relatime
+          - target: /var/lib/snapd
+            source: /dev/xvda7
+            fstype: ext4
+            options: rw,nosuid,nodev,relatime
+          - target: /var/lib/mysql
+            source: /dev/xvda6
+            fstype: ext4
+            options: rw,nosuid,nodev,relatime
+      - target: /chroot
+        source: /dev/xvda5
+        fstype: ext4
+        options: rw,nosuid,relatime
+      - target: /chroots/wiki
+        source: /dev/xvda5
+        fstype: ext4
+        options: ro,nosuid,relatime
+        children:
+          - target: /chroots/wiki/var/www/users/wiki
+            source: /dev/xvda4[/wiki]
+            fstype: ext4
+            options: rw,nosuid,nodev,relatime
+          - target: /chroots/wiki/run/mysqld
+            source: tmpfs[/mysqld]
+            fstype: tmpfs
+            options: ro,nosuid,nodev,noexec,relatime,size=820348k,mode=755
+          - target: /chroots/wiki/home/wiki
+            source: /dev/xvda4[/wiki]
+            fstype: ext4
+            options: rw,nosuid,nodev,relatime
+          - target: /chroots/wiki/run/chroot
+            source: tmpfs[/chroot]
+            fstype: tmpfs
+            options: ro,nosuid,nodev,noexec,relatime,size=820348k,mode=755
+```
+
 ### facts_local.quotatool_home
 
 * [templates/quotatool.fact.j2](templates/quotatool.fact.j2)
