@@ -102,9 +102,7 @@
 
     - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
-      when:
-        - quota_quotaon is defined
-        - ((quota_existing_grace_block | int) != (quota_grace_block | int)) or ((quota_existing_grace_inode | int) != (quota_grace_inode | int))
+      when: ((quota_existing_grace_block | int) != (quota_grace_block | int)) or ((quota_existing_grace_inode | int) != (quota_grace_inode | int))
 
     - name: Quota warning config in place
       ansible.builtin.template:
