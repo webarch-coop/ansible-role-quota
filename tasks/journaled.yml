@@ -83,6 +83,11 @@
         verbosity: 2
       when: quota_quotaon is defined
 
+    - name: "Check that quota is enabled for {{ quota_dir }}"
+      ansible.builtin.command: "quotacheck {{ quota_dir }}"
+      changed_when: false
+      check_mode: false
+
     - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
       when:
