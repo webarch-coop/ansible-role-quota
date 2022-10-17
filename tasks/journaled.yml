@@ -96,7 +96,7 @@
       failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or (quota_quotaon_print.stdout_lines[1] != quota_quotaon_print_user)
 
     - name: Debug quotaon -p user result
-      ansible,builtin.debug:
+      ansible.builtin.debug:
         var: quota_quotaon_print.stdout_lines[1]
         verbosity: 2
 
