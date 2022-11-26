@@ -15,8 +15,10 @@
         - name: Manually move the aquota.user file to /root/aquota.user.bak
           ansible.builtin.fail:
             msg:
-              - "Please SSH to this server as root, stop all the services that use the {{ quota_dir }} and then unmount it and run:"
+              - "Please SSH to this server as root, and edit /etc/fstab to remove 'quota,usrjquota=aquota' from the options for {{ quota_device }}"
+              - "Then stop all the services that use the {{ quota_dir }} and then unmount, remount it and then run:"
               - "mv {{ quota_dir }}/aquota.user /root/aquota.user.bak"
+              - "Then unount {{ quota_dir }} and run:"
               - "tune2fs -O quota {{ quota_device }}"
               - "Then reboot the server and re-run this role and also re-run the tasks to set the quotas as they need resetting when switching from aquota to journald."
 
