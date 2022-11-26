@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/quota/badges/master/pipeline.svg)](https://git.coop/webarch/quota/-/commits/master)
 
-This role currently only works with users quotas, not groups or projects, using `aquota`, `quota` version 2 on `ext3` and `ext4` filesystems, support for `journald` quotas should be added in the future.
+This role currently only works with users quotas, not groups or projects, using `journald` quotas when available and falling back to using `aquota` on older systemd.
 
 This role is designed to configure one directory with users quotas, the `quota_dir` has to be a partition and this role will fail if it isn't, it defaults to `/home`.
 
