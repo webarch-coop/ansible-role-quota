@@ -2,10 +2,23 @@
 - name: Journaled usrquota
   block:
 
-    - name: Move the aquota.user file if it exists to /root/aquota.user.bak
-      ansible.builtin.command: "mv {{ quota_dir }}/aquota.user /root/aquota.user.bak"
-      changed_when: true
-      when: quota_aquota_users_file.stat.exists | bool
+    - name: Disable aquota.user
+      block:
+
+        - name: Move the aquota.user file if it exists to /root/aquota.user.bak
+          ansible.builtin.command: "mv {{ quota_dir }}/aquota.user /root/aquota.user.bak"
+          changed_when: true
+          when: quota_aquota_users_file.stat.exists | bool
+
+      rescue:
+
+        - name: Manually move the aquota.user file to /root/aquota.user.bak
+          ansible.builtin.fail:
+            msg:
+              - "Please SSH to this server as root, stop all the services that use the {{ quota_dir }} and then unmount it and run:"
+              - "mv {{ quota_dir }}/aquota.user /root/aquota.user.bak"
+              - "tune2fs -O quota {{ quota_device }}"
+              - "Then reboot the server and re-run this role and also re-run the tasks to set the quotas as they need resetting when switching from aquota to journald."
 
     - name: Manual intervention needed to upgrade ext2 to ext4
       ansible.builtin.fail:
