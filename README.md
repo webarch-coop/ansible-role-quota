@@ -22,7 +22,7 @@ To run everything use the `quota` tag.
 
 | Variable             | Default value                                                                                    | Comments                                            |
 |----------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| quota                | `true`                                                                                           | Run the tasks in this role.                         |
+| quota                | `false`                                                                                          | Run the tasks in this role.                         |
 | quota_dir            | `/home`                                                                                          | The directory that quotas are set below.            |
 | quota_name           | The `quota_dir` with the first `/` removed, subsequent ones and spaces replaced with underscores | The name for the quota directory.                   |
 | quota_grace_block    | `86400`                                                                                          | The quota grace time for blocks.                    |
@@ -58,6 +58,7 @@ This role installs three Bash scripts in `/etc/ansible/facts.d/` which generate 
 ```bash
 /etc/ansible/facts.d/findmnt.fact | yq -P
 ```
+
 ```yaml
 filesystems:
   - target: /
@@ -196,6 +197,7 @@ filesystems:
 ```bash
 /etc/ansible/facts.d/quotatool_home.fact | yq -P
 ```
+
 ```yaml
 state: present
 block_grace: 86400
@@ -209,6 +211,7 @@ inode_grace: 86400
 ```bash
 /etc/ansible/facts.d/repquota_home.fact | yq -P
 ```
+
 ```yaml
 - User: root
   BlockStatus: ok
@@ -244,6 +247,7 @@ inode_grace: 86400
   FileHardLimit: "1048576"
   FileGrace: ""
 ```
+
 ### facts_local.tune2fs_home
 
 * [templates/tune2fs.fact.j2](templates/tune2fs.fact.j2)
@@ -251,6 +255,7 @@ inode_grace: 86400
 ```bash
 /etc/ansible/facts.d/repquota_home.fact | yq -P
 ```
+
 ```yaml
 Filesystem volume name: <none>
 Last mounted on: /home

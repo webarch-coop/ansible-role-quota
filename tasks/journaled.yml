@@ -1,3 +1,12 @@
+# Copyright 2019-2024 Chris Croome
+#
+# This file is part of the Webarchitects quota Ansible role.
+#
+# The Webarchitects quota Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects quota Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects quota Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Journaled usrquota
   block:
@@ -87,6 +96,7 @@
     - name: "Run quotaon {{ quota_dir }}"
       ansible.builtin.command: "quotaon {{ quota_dir }}"
       when: not quota_enabled
+      changed_when: true
       register: quota_quotaon
       failed_when: >-
         ("Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout) or
@@ -105,8 +115,8 @@
 
     - name: "Check that quota is enabled for {{ quota_dir }}"
       ansible.builtin.command: "quotaon -p {{ quota_dir }}"
-      changed_when: false
       check_mode: false
+      changed_when: false
       register: quota_quotaon_print
       failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or (quota_quotaon_print.stdout_lines[1] != quota_quotaon_print_user)
 
@@ -117,6 +127,7 @@
 
     - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
+      changed_when: true
       when: ((quota_existing_grace_block | int) != (quota_grace_block | int)) or ((quota_existing_grace_inode | int) != (quota_grace_inode | int))
 
     - name: Quota warning config in place

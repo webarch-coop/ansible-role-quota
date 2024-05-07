@@ -3,5 +3,5 @@
   ansible.builtin.service:
     name: quota
     state: restarted
-    listen: Restart quota
+  listen: Restart quota
 ...
