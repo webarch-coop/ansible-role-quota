@@ -1,7 +1,29 @@
 ---
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+  listen: Reload systemd
+  tags:
+    - quota
+
 - name: Restart quota
   ansible.builtin.service:
     name: quota
     state: restarted
   listen: Restart quota
+  tags:
+    - quota
+
+- name: Ensure quota is running
+  ansible.builtin.service_facts:
+  register: quota_service_facts
+  until: (quota_service_facts | community.general.json_query(quota_service_jmespath_query).state == "running"
+  retries: 10
+  delay: 2
+  listen: Restart quota
+  vars:
+    quota_service_jmespath_query: 'ansible_facts.services.["quota.service"]|[0]'
+  tags:
+    - mariadb
 ...

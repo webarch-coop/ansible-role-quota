@@ -91,6 +91,7 @@
     - name: Quota enabled and running
       ansible.builtin.service:
         name: quota
+        enabled: true
         state: started
 
     - name: "Run quotaon {{ quota_dir }}"
