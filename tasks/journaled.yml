@@ -49,6 +49,11 @@
           - "Then edit the filesystem version in /etc/fstab and reboot the server and re-run this role."
       when: quota_device_fstype == "ext3"
 
+    - name: Debug existing device features
+      ansible.builtin.debug:
+        var: quota_device_features
+        verbosity: 2
+
     - name: Manual intervention needed to enable journaled usrquota
       ansible.builtin.fail:
         msg:
@@ -57,7 +62,7 @@
           - "Then reboot the server and re-run this role and also re-run the tasks to set the quotas as they need resetting when switching from aquota to journald."
       when: ("quota" not in quota_device_features)
 
-    - name: Debug exists device options
+    - name: Debug existing device options
       ansible.builtin.debug:
         var: quota_device_options
         verbosity: 2

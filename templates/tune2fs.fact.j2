@@ -9,7 +9,7 @@ jo=$(type -P jo || echo "absent")
 tune2fs=$(type -P tune2fs || echo "absent")
 
 if [[ "${tune2fs}" != "absent" && "${jc}" != "absent" ]]; then
-  "${tune2fs}" -l /dev/xvda4 | tail -n +2 | "${jc}" -m --kv
+  "${tune2fs}" -l {{ quota_device }} | tail -n +2 | "${jc}" -m --kv
 else
   if [[ "${jo}" != "absent" ]]; then
     "${jo}" state=absent
@@ -17,3 +17,5 @@ else
     echo '{"state":"absent"}'
   fi
 fi
+
+# vim: syntax=bash
