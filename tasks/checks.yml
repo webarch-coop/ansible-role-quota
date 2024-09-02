@@ -94,29 +94,6 @@
         - ansible_local['quotatool_' ~ quota_name] is defined
         - ansible_local['quotatool_' ~ quota_name].state != "absent"
 
-    - name: Debug the mounts
-      ansible.builtin.debug:
-        var: ansible_facts.mounts
-        verbosity: 2
-
-    - name: Set a fact for the mounts
-      ansible.builtin.set_fact:
-        quota_mounts: "{{ ansible_facts.mounts }}"
-
-    - name: "Set device and mount options variables for {{ quota_dir }}"
-      ansible.builtin.set_fact:
-        # See vars/main.yml for quota_device_query
-        quota_device: "{{ quota_mounts | community.general.json_query(quota_device_query) }}"
-        # See vars/main.yml for quota_device_options_query
-        quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list | sort }}"
-        # See vars/main.yml for quota_device_fstype_query
-        quota_device_fstype: "{{ quota_mounts | community.general.json_query(quota_device_fstype_query) }}"
-
-    - name: Debug the quota device
-      ansible.builtin.debug:
-        var: quota_device
-        verbosity: 2
-
     - name: Only ext2, ext3 and ext4 filesystems are supported
       ansible.builtin.assert:
         that:
