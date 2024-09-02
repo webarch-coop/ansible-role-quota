@@ -25,7 +25,7 @@
         # See vars/main.yml for quota_device_query
         quota_device: "{{ quota_mounts | community.general.json_query(quota_device_query) }}"
         # See vars/main.yml for quota_device_options_query
-        quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list }}"
+        quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list | sort }}"
         # See vars/main.yml for quota_device_fstype_query
         quota_device_fstype: "{{ quota_mounts | community.general.json_query(quota_device_fstype_query) }}"
 
