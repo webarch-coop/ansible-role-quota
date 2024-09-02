@@ -69,7 +69,7 @@
 
     - name: Set a fact for the list of required options in /etc/fstab
       ansible.builtin.set_fact:
-        quota_device_journaled_options: "{{ quota_device_options | difference(quota_device_aquota_options_required) | join(',') }}"
+        quota_device_journaled_options: "{{ (quota_device_options | difference(quota_device_aquota_options_required)) | sort | join(',') }}"
 
     - name: Debug list of required options in /etc/fstab
       ansible.builtin.debug:
@@ -142,7 +142,7 @@
         dest: /etc/warnquota.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Quota warning defaults in place
       ansible.builtin.template:
@@ -150,7 +150,7 @@
         dest: /etc/default/quota
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Warn that a reboot might be needed
       ansible.builtin.debug:
