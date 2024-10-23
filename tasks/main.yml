@@ -56,11 +56,11 @@
 
         - name: Include journaled tasks for Debian Bullseye and Bookworm
           ansible.builtin.include_tasks: journaled.yml
-          when: ansible_distribution_major_version is version('11', '>=')
+          when: ansible_facts.distribution_major_version is version('11', '>=')
 
         - name: Include aquota tasks for Debian Buster and Stretch
           ansible.builtin.include_tasks: aquota.yml
-          when: ansible_distribution_major_version is version('11', '<')
+          when: ansible_facts.distribution_major_version is version('11', '<')
 
       when: (quota is defined) and (quota | bool)
 

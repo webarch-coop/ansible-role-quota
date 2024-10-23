@@ -13,13 +13,13 @@
 
     - name: Set a fact for the Linux kernel version
       ansible.builtin.set_fact:
-        quota_linux_kernel: "{{ ansible_kernel | regex_replace('-.*$') }}"
+        quota_linux_kernel: "{{ ansible_facts.kernel | regex_replace('-.*$') }}"
 
     - name: Check that the OS is Debian Stretch or above running Linux 2.6.28 or above
       ansible.builtin.assert:
         that:
-          - ansible_distribution_file_variety == "Debian"
-          - ansible_distribution_major_version is version('9', '>=')
+          - ansible__facts.distribution_file_variety == "Debian"
+          - ansible__facts.distribution_major_version is version('9', '>=')
           - quota_linux_kernel is version('2.6.28', '>')
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
@@ -57,7 +57,7 @@
 
         - name: "Set a variable for the grace array for {{ quota_dir }}"
           ansible.builtin.set_fact:
-            quota_grace_array: "{{ ansible_local['quotatool_' ~ quota_name] }}"
+            quota_grace_array: "{{ ansible_facts.ansible_local['quotatool_' ~ quota_name] }}"
 
         - name: "Debug grace quota array for {{ quota_dir }}"
           ansible.builtin.debug:
@@ -91,8 +91,8 @@
           when: (quota_existing_grace_block is defined) and (quota_existing_grace_inode is defined)
 
       when:
-        - ansible_local['quotatool_' ~ quota_name] is defined
-        - ansible_local['quotatool_' ~ quota_name].state != "absent"
+        - ansible_facts.ansible_local['quotatool_' ~ quota_name] is defined
+        - ansible_facts.ansible_local['quotatool_' ~ quota_name].state != "absent"
 
     - name: Only ext2, ext3 and ext4 filesystems are supported
       ansible.builtin.assert:
@@ -121,20 +121,20 @@
 
         - name: "Debug {{ quota_device }} tune2fs listing"
           ansible.builtin.debug:
-            var: ansible_local['tune2fs_' ~ quota_name]
+            var: ansible_facts.ansible_local['tune2fs_' ~ quota_name]
             verbosity: 2
 
         - name: Set a fact for the device features
           ansible.builtin.set_fact:
             # See vars/main.yml for quota_device_features_query
-            quota_device_features: "{{ ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query(quota_device_features_query) | split(' ') | list }}"
+            quota_device_features: "{{ ansible_facts.ansible_local['tune2fs_' ~ quota_name] | dict2items | community.general.json_query(quota_device_features_query) | split(' ') | list }}"
 
         - name: "Debug {{ quota_device }} mount features array"
           ansible.builtin.debug:
             var: quota_device_features
             verbosity: 2
 
-      when: ansible_local['tune2fs_' ~ quota_name] is defined
+      when: ansible_facts.ansible_local['tune2fs_' ~ quota_name] is defined
 
     - name: "Check if usrjquota=aquota.user is present for {{ quota_device }}"
       ansible.builtin.set_fact:

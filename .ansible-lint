@@ -12,5 +12,6 @@
 skip_list:
   - key-order[task]
   - name[template]
+var_naming_pattern: "^[quota|molecule]_?[a-z_]*$"
 # vim: syntax=yaml
 ...
