@@ -18,8 +18,8 @@
     - name: Check that the OS is Debian Stretch or above running Linux 2.6.28 or above
       ansible.builtin.assert:
         that:
-          - ansible__facts.distribution_file_variety == "Debian"
-          - ansible__facts.distribution_major_version is version('9', '>=')
+          - ansible_facts.distribution_file_variety == "Debian"
+          - ansible_facts.distribution_major_version is version('9', '>=')
           - quota_linux_kernel is version('2.6.28', '>')
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
