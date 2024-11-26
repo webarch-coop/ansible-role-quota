@@ -13,6 +13,7 @@ quota_dir: /home
 quota_name: "{{ quota_dir | regex_replace('^\/') | regex_replace('\/', '_') | regex_replace(' ', '_') }}"
 quota_grace_block: 86400
 quota_grace_inode: 86400
+quota_state: enabled
 quota_warn: true
 quota_warn_from: "root@{{ inventory_hostname }}"
 quota_warn_subject: "Over quota on {{ inventory_hostname }}"

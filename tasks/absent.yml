@@ -1,0 +1,92 @@
+# Copyright 2019-2024 Chris Croome
+#
+# This file is part of the Webarchitects quota Ansible role.
+#
+# The Webarchitects quota Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects quota Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects quota Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Quota stopped and removed
+  block:
+
+    - name: Populate service facts
+      ansible.builtin.service_facts:
+
+    - name: Debug service facts
+      ansible.builtin.debug:
+        var: ansible_facts.services
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Debug quota service
+      ansible.builtin.debug:
+        var: ansible_facts.services | community.general.json_query('["quota.service"]|[0]')
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Quota service stopped
+      ansible.builtin.systemd_service:
+        name: quota
+        state: stopped
+      notify: Reload systemd
+      when: (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).state == "running"
+
+    - name: Quota service disabled
+      ansible.builtin.systemd_service:
+        name: quota
+        enabled: false
+      notify: Reload systemd
+      when: (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).status != "not-found"
+
+    - name: Debug quotaon service
+      ansible.builtin.debug:
+        var: ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Quotaon service stopped
+      ansible.builtin.systemd_service:
+        name: quotaon
+        enabled: false
+        state: stopped
+      notify: Reload systemd
+      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state == "running"
+
+    - name: Quotaon service disabled
+      ansible.builtin.systemd_service:
+        name: quotaon
+        enabled: false
+      notify: Reload systemd
+      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status != "not-found"
+
+    - name: Quota packages absent
+      ansible.builtin.apt:
+        pkg:
+          - quota
+          - quotatool
+        state: absent
+        autoclean: true
+        autoremove: true
+      notify: Reload systemd
+
+    - name: Quota local facts absent
+      ansible.builtin.file:
+        path: "/etc/ansible/facts.d/{{ quota_fact_file }}"
+        state: absent
+      loop:
+        - findmnt.fact
+        - "quotatool_*.fact"
+        - "repquota_*.fact"
+        - "tune2fs_*.fact"
+      loop_control:
+        loop_var: quota_fact_file
+      register: quota_facts_absent
+
+    - name: Re-read Ansible local facts
+      ansible.builtin.setup:
+        filter: ansible_local
+      when: quota_facts_absent.changed
+
+  when: quota_state == "absent"
+  tags:
+    - quota
+...

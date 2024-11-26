@@ -8,13 +8,16 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects quota Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-quota_device_features_query: "[?key == 'Filesystem features'].value | [0]"
-quota_device_fstype_query: "[?mount == '{{ quota_dir }}'].fstype | [0]"
-quota_device_options_query: "[?mount == '{{ quota_dir }}'].options | [0]"
-quota_device_query: "[?mount == '{{ quota_dir }}'].device | [0]"
+quota_device: "{{ ansible_facts.mounts | community.general.json_query(quota_device_query) }}"
 quota_device_aquota_options_required:
   - quota
   - usrjquota=aquota.user
   - jqfmt=vfsv0
+quota_device_features_query: "[?key == 'Filesystem features'].value | [0]"
+quota_device_fstype: "{{ ansible_facts.mounts | community.general.json_query(quota_device_fstype_query) }}"
+quota_device_fstype_query: "[?mount == '{{ quota_dir }}'].fstype | [0]"
+quota_device_options: "{{ ansible_facts.mounts | community.general.json_query(quota_device_options_query) | split(',') | list | sort }}"
+quota_device_options_query: "[?mount == '{{ quota_dir }}'].options | [0]"
+quota_device_query: "[?mount == '{{ quota_dir }}'].device | [0]"
 quota_quotaon_print_user: "user quota on {{ quota_dir }} ({{ quota_device }}) is on"
 ...

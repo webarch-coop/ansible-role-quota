@@ -8,62 +8,26 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects quota Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Configure quota
-  block:
+- name: Quota role skipped
+  ansible.builtin.debug:
+    msg: "The tasks in the Quota role are not being run since the quota variable is not true."
+  when: not quota | bool
+  tags:
+    - quota
 
-    - name: Debug the mounts
-      ansible.builtin.debug:
-        var: ansible_facts.mounts
-        verbosity: 2
+- name: Disable and remove quota
+  ansible.builtin.include_tasks: absent.yml
+  when:
+    - quota | bool
+    - quota_state == "absent"
+  tags:
+    - quota
 
-    - name: Set a fact for the mounts
-      ansible.builtin.set_fact:
-        quota_mounts: "{{ ansible_facts.mounts }}"
-
-    - name: "Set device and mount options variables for {{ quota_dir }}"
-      ansible.builtin.set_fact:
-        # See vars/main.yml for quota_device_query
-        quota_device: "{{ quota_mounts | community.general.json_query(quota_device_query) }}"
-        # See vars/main.yml for quota_device_options_query
-        quota_device_options: "{{ quota_mounts | community.general.json_query(quota_device_options_query) | split(',') | list | sort }}"
-        # See vars/main.yml for quota_device_fstype_query
-        quota_device_fstype: "{{ quota_mounts | community.general.json_query(quota_device_fstype_query) }}"
-
-    - name: Debug the quota device
-      ansible.builtin.debug:
-        var: quota_device
-        # verbosity: 2
-
-    - name: Include quota requirements
-      ansible.builtin.include_tasks: requirements.yml
-      tags:
-        - quota_req
-
-    - name: Include quota local fact tasks
-      ansible.builtin.include_tasks: local_facts.yml
-      tags:
-        - quota_local_facts
-        - quota_req
-
-    - name: Include quota check tasks
-      ansible.builtin.include_tasks: checks.yml
-      when: (quota is defined) and (quota | bool)
-      tags:
-        - quota_check
-
-    - name: Configure quota tasks
-      block:
-
-        - name: Include journaled tasks for Debian Bullseye and Bookworm
-          ansible.builtin.include_tasks: journaled.yml
-          when: ansible_facts.distribution_major_version is version('11', '>=')
-
-        - name: Include aquota tasks for Debian Buster and Stretch
-          ansible.builtin.include_tasks: aquota.yml
-          when: ansible_facts.distribution_major_version is version('11', '<')
-
-      when: (quota is defined) and (quota | bool)
-
+- name: Install, enable and configure quota
+  ansible.builtin.include_tasks: enabled.yml
+  when:
+    - quota | bool
+    - quota_state == "enabled"
   tags:
     - quota
 ...

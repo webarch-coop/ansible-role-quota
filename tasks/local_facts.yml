@@ -92,41 +92,12 @@
     - name: Re-read Ansible local facts
       ansible.builtin.setup:
         filter: ansible_local
-      when: (quota_findmnt_facts.changed | bool) or (quota_quotatool_facts.changed | bool) or (quota_repquota_facts.changed | bool) or (quota_tune2fs_facts | bool)
+      when: >-
+        (quota_findmnt_facts.changed | bool) or
+        (quota_quotatool_facts.changed | bool) or
+        (quota_repquota_facts.changed | bool) or
+        (quota_tune2fs_facts.changed | bool)
 
-  when: quota | bool
   tags:
     - quota
-    - quota_req
-
-- name: Local fact files absent when not quota
-  block:
-
-    - name: "Ansible local facts quotatool script for {{ quota_name }} absent when not quota"
-      ansible.builtin.file:
-        path: "/etc/ansible/facts.d/quotatool_{{ quota_name }}.fact"
-        state: absent
-
-    - name: "Ansible local facts quotatool script for {{ quota_name }} absent when not quota"
-      ansible.builtin.file:
-        path: "/etc/ansible/facts.d/quotatool_{{ quota_name }}.fact"
-        state: absent
-
-    - name: "Ansible local facts repquota script for {{ quota_name }} absent when not quota"
-      ansible.builtin.file:
-        path: "/etc/ansible/facts.d/repquota_{{ quota_name }}.fact"
-        state: absent
-
-    - name: "Ansible local facts tune2fs script for {{ quota_name }} absent when not quota"
-      ansible.builtin.file:
-        path: "/etc/ansible/facts.d/tune2fs_{{ quota_name }}.fact"
-        state: absent
-
-    - name: Re-read Ansible facts
-      ansible.builtin.setup:
-
-  when: not quota | bool
-  tags:
-    - quota
-    - quota_req
 ...
