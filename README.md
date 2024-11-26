@@ -8,38 +8,13 @@ This role is designed to configure one directory with users quotas, the `quota_d
 
 You can set users quotas by using the [users role](https://git.coop/webarch/users), the tasks for this in that role should be rewritten and moved to this role in the future.
 
-## Tags and check mode
-
-The first time this role is run it needs to not be in check mode and as a minimum the `quota_req`, quota requirememts tag should be used so that the tasks in [tasks/requirements.yml](tasks/requirements.yml) and [tasks/local_facts.yml](tasks/local_facts.yml) are run.
-
-Once the requirements are in place then the role can be run in `--check` mode.
-
-To only run the checks you can use the `quota_check` tag.
-
-To run everything use the `quota` tag.
-
-## Defaults
-
-| Variable             | Default value                                                                                    | Comments                                            |
-|----------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| quota                | `false`                                                                                          | Run the tasks in this role.                         |
-| quota_dir            | `/home`                                                                                          | The directory that quotas are set below.            |
-| quota_name           | The `quota_dir` with the first `/` removed, subsequent ones and spaces replaced with underscores | The name for the quota directory.                   |
-| quota_grace_block    | `86400`                                                                                          | The quota grace time for blocks.                    |
-| quota_grace_inode    | `86400`                                                                                          | The quota grace time for inodes.                    |
-| quota_repquota       | `/usr/sbin/repquota`                                                                             | The path to repquota.                               |
-| quota_quotatool      | `/usr/sbin/quotatool`                                                                            | The path to quotatool.                              |
-| quota_tune2fs        | `/sbin/tune2fs`                                                                                  | The path to tune2fs.                                |
-| quota_warn           | `true`                                                                                           | Warn when quota are reached.                        |
-| quota_warn_from      | `root@localhost`                                                                                 | From address for the quota warning emails.          |
-| quota_warn_subject   | `Over quota`                                                                                     | Subject line for the quota warning emails.          |
-| quota_warn_cc        | `root@localhost`                                                                                 | CC address for the quota warning emails.            |
-| quota_warn_support   | `root@localhost`                                                                                 | Support email address for the quota warning emails. |
-| quota_warn_phone     |                                                                                                  | Phone number for the quota warning emails.          |
-| quota_warn_message   |                                                                                                  | Message for the quota warning emails.               |
-| quota_warn_signature |                                                                                                  | Signature for the quota warning emails.             |
+## Variables
 
 See the [defaults/main.yml](defaults/main.yml) file for the default settings.
+
+By default `quota` is false, set it to run to run the tasks in this role.
+
+By default `qouta_state` set `enabled`, set it to `absent` to disable and remove quota configuration and packages.
 
 ## Role repo
 
