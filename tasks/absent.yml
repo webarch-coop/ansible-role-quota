@@ -58,6 +58,10 @@
       notify: Reload systemd
       when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status != "not-found"
 
+    # TODO add tasks to:
+    # systemctl daemon-reload
+    # systemctl reset-failed
+
     - name: Quota packages absent
       ansible.builtin.apt:
         pkg:
