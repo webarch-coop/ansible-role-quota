@@ -42,7 +42,7 @@
     - name: Configure quota tasks
       block:
 
-        - name: Include journaled tasks for Debian Bullseye and Bookworm
+        - name: Include journaled tasks for Debian Bullseye, Bookworm, Trixie and later
           ansible.builtin.include_tasks: journaled.yml
           when: ansible_facts.distribution_major_version is version('11', '>=')
 

@@ -15,19 +15,34 @@
   tags:
     - quota
 
-- name: Disable and remove quota
-  ansible.builtin.include_tasks: absent.yml
-  when:
-    - quota | bool
-    - quota_state == "absent"
-  tags:
-    - quota
+- name: Run the tasks in this role
+  block:
 
-- name: Install, enable and configure quota
-  ansible.builtin.include_tasks: enabled.yml
-  when:
-    - quota | bool
-    - quota_state == "enabled"
+    - name: This role has only been tested on Debian
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution is defined
+          - ansible_facts.distribution == "Debian"
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          {%- if ansible_facts.distribution is defined -%}
+          The {{ inventory_hostname }} server appears to be running {{ ansible_facts.distribution }} however this roles only supports Debian.
+          {%- else -%}
+          The variable ansible_facts.distribution_release is not defined for {{ inventory_hostname }}, please enable fact garthering.
+          {%- endif -%}
+
+    - name: Disable and remove quota
+      ansible.builtin.include_tasks: absent.yml
+      when:
+        - quota | bool
+        - quota_state == "absent"
+
+    - name: Install, enable and configure quota
+      ansible.builtin.include_tasks: enabled.yml
+      when:
+        - quota | bool
+        - quota_state == "enabled"
+
   tags:
     - quota
 ...
