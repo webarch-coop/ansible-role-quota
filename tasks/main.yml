@@ -18,7 +18,7 @@
 - name: Run the tasks in this role
   block:
 
-    - name: This role has only been tested on Debian
+    - name: This role has only been tested on Debian  # noqa jinja[spacing]
       ansible.builtin.assert:
         that:
           - ansible_facts.distribution is defined

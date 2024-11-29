@@ -1,15 +1,45 @@
+# Copyright 2019-2024 Chris Croome
+#
+# This file is part of the Webarchitects quota Ansible role.
+#
+# The Webarchitects quota Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects quota Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects quota Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-image: registry.git.coop/webarch/containers/images/ansible:0.12.0
 variables:
-  PY_COLORS: "1"
+  ANSIBLE_ANY_ERRORS_FATAL: "1"
+  ANSIBLE_CALLBACK_RESULT_FORMAT: "yaml"
+  ANSIBLE_DIFF_ALWAYS: "1"
+  ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
+  ANSIBLE_ERROR_ON_UNDEFINED_VARS: "1"
   ANSIBLE_FORCE_COLOR: "1"
+  ANSIBLE_INJECT_FACT_VARS: "0"
+  ANSIBLE_REMOTE_TMP: "/tmp"
+  ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
+  DEBIAN_FRONTEND: noninteractive
+  DEFAULT_MANAGED_STR: "Ansible managed"
+  MOLECULE_VERBOSITY: "0"
+  PRE_COMMIT_COLOR: always
+  PY_COLORS: "1"
 before_script:
+  - whoami
+  - pwd
   - chmod 700 $(pwd)
+  - which ansible
+  - ansible --version
+  - which yamllint
+  - yamllint --version
+  - which molecule
+  - molecule --version
 stages:
-  - lint
-lint:
-  stage: lint
+  - bookworm
+bookworm:
+  image: registry.git.coop/webarch/containers/images/bookworm:20241107
+  stage: bookworm
   script:
-    - molecule lint
-# vim: syntax=yaml
+    - pre-commit install
+    - pre-commit run --all-files
+    # molecule test --all
 ...
