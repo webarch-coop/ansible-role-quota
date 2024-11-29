@@ -50,7 +50,7 @@
     - name: Debug aquota.user file check
       ansible.builtin.debug:
         var: quota_aquota_users_file
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: Set grace variables
       block:
@@ -62,7 +62,7 @@
         - name: "Debug grace quota array for {{ quota_dir }}"
           ansible.builtin.debug:
             var: quota_grace_array
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
         - name: "Set variables for existing block and inode grace time in seconds for {{ quota_dir }}"
           ansible.builtin.set_fact:
@@ -73,13 +73,13 @@
         - name: "Existing block grace time in seconds for {{ quota_dir }}"
           ansible.builtin.debug:
             var: quota_existing_grace_block
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
           when: quota_existing_grace_block is defined
 
         - name: "Existing inode grace time in seconds for {{ quota_dir }}"
           ansible.builtin.debug:
             var: quota_existing_grace_inode
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
           when: quota_existing_grace_inode is defined
 
         - name: Ensure that block and inode grace times consist of numbers when defined
@@ -103,7 +103,7 @@
     - name: Debug quota device options
       ansible.builtin.debug:
         var: quota_device_options
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: "Ensure that the device and device options for {{ quota_dir }} are not empty"
       ansible.builtin.assert:
@@ -122,7 +122,7 @@
         - name: "Debug {{ quota_device }} tune2fs listing"
           ansible.builtin.debug:
             var: ansible_facts.ansible_local['tune2fs_' ~ quota_name]
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
         - name: Set a fact for the device features
           ansible.builtin.set_fact:
@@ -132,7 +132,7 @@
         - name: "Debug {{ quota_device }} mount features array"
           ansible.builtin.debug:
             var: quota_device_features
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
       when: ansible_facts.ansible_local['tune2fs_' ~ quota_name] is defined
 
@@ -156,7 +156,7 @@
     - name: "Debug the quota_type when defined"
       ansible.builtin.debug:
         var: quota_type
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: quota_type is defined
 
     - name: "Ensure that quota_type is valid if defined for {{ quota_dir }}"
@@ -176,13 +176,13 @@
     - name: "Debug the standard output from quotaon -pu {{ quota_dir }}"
       ansible.builtin.debug:
         var: quota_quotaon.stdout
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: quota_quotaon.stdout | length > 0
 
     - name: "Debug the standard error from quotaon -pu {{ quota_dir }}"
       ansible.builtin.debug:
         var: quota_quotaon.stderr
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: quota_quotaon.stderr | length > 0
 
     - name: "Set quota_enabled variable for {{ quota_dir }}"
@@ -198,19 +198,16 @@
 
     - name: "Debug check results for {{ quota_dir }}"
       ansible.builtin.debug:
-        msg:
-          - "{{ quota_quotaon.stdout }} using {{ quota_type }}"
-        verbosity: 1
+        msg: "{{ quota_quotaon.stdout }} using {{ quota_type }}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: quota_type is defined
 
-    - name: "Debug check results for {{ quota_dir }}"
+    - name: Debug quota_quotaon.stdout
       ansible.builtin.debug:
-        msg:
-          - "{{ quota_quotaon.stdout }}"
-        verbosity: 1
+        var: quota_quotaon.stdout
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: quota_type is not defined
 
   tags:
     - quota
-    - quota_check
 ...

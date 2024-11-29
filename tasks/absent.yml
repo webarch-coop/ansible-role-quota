@@ -36,7 +36,7 @@
         name: quota
         enabled: false
       notify: Reload systemd
-      when: (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).status != "not-found"
+      when: (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).status is not ansible.builtin.regex('inactive|not-found')
 
     - name: Debug quotaon service
       ansible.builtin.debug:
@@ -46,7 +46,6 @@
     - name: Quotaon service stopped
       ansible.builtin.systemd_service:
         name: quotaon
-        enabled: false
         state: stopped
       notify: Reload systemd
       when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state == "running"
@@ -85,7 +84,7 @@
         loop_var: quota_fact_file
       register: quota_facts_absent
 
-    - name: Re-read Ansible local facts
+    - name: Re-read Ansible local facts  # noqa no-handler
       ansible.builtin.setup:
         filter: ansible_local
       when: quota_facts_absent.changed

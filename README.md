@@ -8,6 +8,8 @@ This role is designed to configure one directory with users quotas, the `quota_d
 
 You can set users quotas by using the [users role](https://git.coop/webarch/users), the tasks for this in that role should be rewritten and moved to this role in the future.
 
+Note that due to some [issues with the quotaon systemd service](https://git.coop/webarch/quota/-/issues/6) this role disables it.
+
 ## Variables
 
 See the [defaults/main.yml](defaults/main.yml) file for the default settings.

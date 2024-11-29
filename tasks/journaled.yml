@@ -93,49 +93,59 @@
     - name: Include quota check tasks
       ansible.builtin.include_tasks: checks.yml
 
+    - name: Populate service facts
+      ansible.builtin.service_facts:
+
+    - name: Debug service facts
+      ansible.builtin.debug:
+        var: ansible_facts.services
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Debug quota service
+      ansible.builtin.debug:
+        var: ansible_facts.services | community.general.json_query('["quota.service"]|[0]')
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
     - name: Quota enabled and running
       ansible.builtin.service:
         name: quota
         enabled: true
         state: started
 
-    - name: "Run quotaon {{ quota_dir }}"
-      ansible.builtin.command: "quotaon {{ quota_dir }}"
-      when: not quota_enabled
+    # The quotaon systemd service doesn't work
+    # https://git.coop/webarch/quota/-/issues/6
+
+    - name: Debug quotaon service
+      ansible.builtin.debug:
+        var: ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Quotaon service stopped
+      ansible.builtin.systemd_service:
+        name: quotaon
+        state: stopped
+      notify: Reload systemd
+      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state is not ansible.builtin.regex('^inactive|stopped$')
+
+    - name: Quotaon service disabled
+      ansible.builtin.systemd_service:
+        name: quotaon
+        enabled: false
+      notify: Reload systemd
+      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status is not ansible.builtin.regex('^enabled|static$')
+
+    - name: Systemd reset-failed
+      ansible.builtin.command: systemctl reset-failed
       changed_when: true
-      register: quota_quotaon
-      failed_when: >-
-        ("Cannot find filesystem to check or filesystem not mounted with quota option" in quota_quotaon.stdout) or
-        ("not found or has no quota enabled" in quota_quotaon.stdout)
+      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status == "failed"
 
-    - name: Debug quotaon results
+    - name: Populate service facts
+      ansible.builtin.service_facts:
+
+    - name: Debug quotaon service
       ansible.builtin.debug:
-        var: quota_quotaon
+        var: ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-      when: quota_quotaon is defined
-
-    - name: Debug quotaon -p user expected result
-      ansible.builtin.debug:
-        var: quota_quotaon_print_user
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-
-    - name: "Check that quota is enabled for {{ quota_dir }}"
-      ansible.builtin.command: "quotaon -p {{ quota_dir }}"
-      check_mode: false
-      changed_when: false
-      register: quota_quotaon_print
-      failed_when: (quota_quotaon_print.rc is not regex('^0|2')) or (quota_quotaon_print.stdout_lines[1] != quota_quotaon_print_user)
-
-    - name: Debug quotaon -p user result
-      ansible.builtin.debug:
-        var: quota_quotaon_print.stdout_lines[1]
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-
-    # The quotaon systemd service doesn't work, see these issues
-    # https://github.com/systemd/systemd/issues/29905
-    # https://github.com/systemd/systemd/issues/29901
-    # so disable it
-
 
     - name: "Set the gracetimes for {{ quota_dir }}"
       ansible.builtin.command: "setquota -t {{ quota_grace_block }} {{ quota_grace_inode }} {{ quota_dir }}"
@@ -165,5 +175,4 @@
 
   tags:
     - quota
-    - quota_journald
 ...
