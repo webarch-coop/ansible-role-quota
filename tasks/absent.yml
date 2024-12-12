@@ -24,42 +24,64 @@
         var: ansible_facts.services | community.general.json_query('["quota.service"]|[0]')
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
-    - name: Quota service stopped
-      ansible.builtin.systemd_service:
-        name: quota
-        state: stopped
-      notify: Reload systemd
-      when: (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).state == "running"
+    - name: Stop and disable quota service
+      block:
 
-    - name: Quota service disabled
-      ansible.builtin.systemd_service:
-        name: quota
-        enabled: false
-      notify: Reload systemd
-      when: (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).status is not ansible.builtin.regex('inactive|not-found')
+        - name: Quota service stopped
+          ansible.builtin.systemd_service:
+            name: quota
+            state: stopped
+          notify: Reload systemd
+          when:
+            - (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).state is defined
+            - (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).state == "running"
+
+        - name: Quota service disabled
+          ansible.builtin.systemd_service:
+            name: quota
+            enabled: false
+          notify: Reload systemd
+          when:
+            - (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).status is defined
+            - (ansible_facts.services | community.general.json_query('["quota.service"]|[0]')).status is not ansible.builtin.regex('inactive|not-found')
+
+      when: ansible_facts.services | community.general.json_query('["quota.service"]|[0]') | ansible.builtin.type_debug != "NoneType"
 
     - name: Debug quotaon service
       ansible.builtin.debug:
         var: ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
-    - name: Quotaon service stopped
-      ansible.builtin.systemd_service:
-        name: quotaon
-        state: stopped
-      notify: Reload systemd
-      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state == "running"
+    - name: Stop and disable quotaon service
+      block:
 
-    - name: Quotaon service disabled
-      ansible.builtin.systemd_service:
-        name: quotaon
-        enabled: false
-      notify: Reload systemd
-      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status != "not-found"
+        - name: Quotaon service stopped
+          ansible.builtin.systemd_service:
+            name: quotaon
+            state: stopped
+          notify: Reload systemd
+          when:
+            - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state is defined
+            - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state == "running"
 
-    # TODO add tasks to:
-    # systemctl daemon-reload
-    # systemctl reset-failed
+        - name: Quotaon service disabled
+          ansible.builtin.systemd_service:
+            name: quotaon
+            enabled: false
+          notify: Reload systemd
+          when:
+            - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status is defined
+            - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status != "not-found"
+
+        - name: Systemd reset-failed
+          ansible.builtin.command: systemctl reset-failed
+          changed_when: true
+          notify: Reload systemd
+          when:
+            - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status is defined
+            - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status == "failed"
+
+      when: ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]') | ansible.builtin.type_debug != "NoneType"
 
     - name: Quota packages absent
       ansible.builtin.apt:
