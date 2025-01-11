@@ -64,6 +64,12 @@
             - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state is defined
             - (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state == "running"
 
+        - name: Quotaon service file absent /usr/lib/systemd/system/quotaon.service
+          ansible.builtin.command:
+            cmd: mv /usr/lib/systemd/system/quotaon.service /usr/lib/systemd/system/.quotaon.service.ansible.bak
+            creates: /usr/lib/systemd/system/.quotaon.service.ansible.bak
+            removes: /usr/lib/systemd/system/quotaon.service
+
         - name: Quotaon service disabled
           ansible.builtin.systemd_service:
             name: quotaon
