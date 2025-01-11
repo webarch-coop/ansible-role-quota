@@ -1,4 +1,4 @@
-# Copyright 2019-2024 Chris Croome
+# Copyright 2019-2025 Chris Croome
 #
 # This file is part of the Webarchitects quota Ansible role.
 #
@@ -107,7 +107,7 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Quota enabled and running
-      ansible.builtin.service:
+      ansible.builtin.systemd_service:
         name: quota
         enabled: true
         state: started
@@ -124,20 +124,28 @@
       ansible.builtin.systemd_service:
         name: quotaon
         state: stopped
-      notify: Reload systemd
+      notify:
+        - Reload systemd
+        - Reset failed
       when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).state is not ansible.builtin.regex('^inactive|stopped$')
 
     - name: Quotaon service disabled
       ansible.builtin.systemd_service:
         name: quotaon
         enabled: false
-      notify: Reload systemd
+      notify:
+        - Reload systemd
+        - Reset failed
       when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status is not ansible.builtin.regex('^enabled|static$')
 
-    - name: Systemd reset-failed
-      ansible.builtin.command: systemctl reset-failed
-      changed_when: true
-      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status == "failed"
+    - name: Quotaon service file absent /usr/lib/systemd/system/quotaon.service
+      ansible.builtin.command:
+        cmd: mv /usr/lib/systemd/system/quotaon.service /usr/lib/systemd/system/.quotaon.service.ansible.bak
+        creates: /usr/lib/systemd/system/.quotaon.service.ansible.bak
+        removes: /usr/lib/systemd/system/quotaon.service
+      notify:
+        - Reload systemd
+        - Reset failed
 
     - name: Populate service facts
       ansible.builtin.service_facts:

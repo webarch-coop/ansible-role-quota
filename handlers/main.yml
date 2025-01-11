@@ -1,4 +1,4 @@
-# Copyright 2019-2024 Chris Croome
+# Copyright 2019-2025 Chris Croome
 #
 # This file is part of the Webarchitects quota Ansible role.
 #
@@ -12,12 +12,12 @@
   block:
 
     - name: Reload systemd
-      ansible.builtin.systemd:
+      ansible.builtin.systemd_service:
         daemon_reload: true
       listen: Reload systemd
 
     - name: Restart quota
-      ansible.builtin.service:
+      ansible.builtin.systemd_service:
         name: quota
         state: restarted
       listen: Restart quota
@@ -32,21 +32,9 @@
       retries: 10
       until: (quota_service_facts | community.general.json_query(quota_service_jmespath_query)).state == "running"
 
-    - name: Restart quotaon
-      ansible.builtin.service:
-        name: quotaon
-        state: restarted
-      listen: Restart quotaon
-
-    - name: Ensure quotaon is running
-      ansible.builtin.service_facts:
-      vars:
-        quota_quotaon_service_jmespath_query: 'ansible_facts.services.["quotaon.service"]|[0]'
-      delay: 2
-      listen: Restart quotaon
-      register: quota_quotaon_service_facts
-      retries: 10
-      until: (quota_service_facts | community.general.json_query(quota_quotaon_service_jmespath_query)).state == "running"
+    - name: Reset failed
+      ansible.builtin.command: systemctl reset-failed
+      listen: Reset failed
 
   tags:
     - quota

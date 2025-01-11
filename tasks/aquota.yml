@@ -1,4 +1,4 @@
-# Copyright 2019-2024 Chris Croome
+# Copyright 2019-2025 Chris Croome
 #
 # This file is part of the Webarchitects quota Ansible role.
 #
@@ -84,7 +84,7 @@
       notify: Restart quota
 
     - name: Quota enabled and running
-      ansible.builtin.service:
+      ansible.builtin.systemd_service:
         name: quota
         state: started
 
