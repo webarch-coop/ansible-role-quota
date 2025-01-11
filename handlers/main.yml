@@ -32,7 +32,7 @@
       retries: 10
       until: (quota_service_facts | community.general.json_query(quota_service_jmespath_query)).state == "running"
 
-    - name: Reset failed
+    - name: Reset failed  # noqa: no-changed-when
       ansible.builtin.command: systemctl reset-failed
       listen: Reset failed
 
