@@ -136,7 +136,7 @@
       notify:
         - Reload systemd
         - Reset failed
-      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status is not ansible.builtin.regex('^enabled|static$')
+      when: (ansible_facts.services | community.general.json_query('["quotaon.service"]|[0]')).status is ansible.builtin.regex('^enabled|static$')
 
     - name: Quotaon service file absent /usr/lib/systemd/system/quotaon.service
       ansible.builtin.command:
