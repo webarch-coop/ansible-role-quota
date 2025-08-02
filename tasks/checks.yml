@@ -185,9 +185,15 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: quota_quotaon.stderr | length > 0
 
-    - name: "Set quota_enabled variable for {{ quota_dir }}"
+    - name: "Set quota_enabled variable to true for {{ quota_dir }}"
       ansible.builtin.set_fact:
-        quota_enabled: "{% if quota_quotaon.stdout is regex('is on$') %}true{% else %}false{% endif %}"
+        quota_enabled: true
+      when: (quota_quotaon.stdout | string) is ansible.builtin.regex('is on$')
+
+    - name: "Set quota_enabled variable to false for {{ quota_dir }}"
+      ansible.builtin.set_fact:
+        quota_enabled: false
+      when: (quota_quotaon.stdout | string) is not ansible.builtin.regex('is on$')
 
     - name: "Ensure that quota_enabled is defined and a booolean for {{ quota_dir }}"
       ansible.builtin.assert:
